@@ -2,11 +2,19 @@ PATH
   remote: .
   specs:
     active_column (0.0.1)
+      simple_uuid
 
 GEM
   remote: http://rubygems.org/
   specs:
+    cassandra (0.8.2)
+      json
+      rake
+      simple_uuid (>= 0.1.0)
+      thrift_client (>= 0.4.0)
     diff-lcs (1.1.2)
+    json (1.4.6)
+    rake (0.8.7)
     rspec (2.2.0)
       rspec-core (~> 2.2)
       rspec-expectations (~> 2.2)
@@ -15,10 +23,16 @@ GEM
     rspec-expectations (2.2.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.2.0)
+    simple_uuid (0.1.1)
+    thrift (0.2.0.4)
+    thrift_client (0.5.0)
+      thrift (~> 0.2.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   active_column!
+  cassandra
   rspec
+  simple_uuid

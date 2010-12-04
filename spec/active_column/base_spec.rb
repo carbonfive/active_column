@@ -1,20 +1,39 @@
 require 'spec_helper'
 
-class SingleKey < ActiveColumn::Base
-  keys [:one]
-end
-
-class MultipleKeys < ActiveColumn::Base
-  keys [:one, :two, :three]
-end
-
 describe ActiveColumn::Base do
+
+  describe '#save' do
+    before do
+      @count1 = $cassandra.count_columns(:time, "1")
+      @count2 = $cassandra.count_columns(:time, "2")
+      SimpleKey.new.save(["1", "2"])
+    end
+
+    it 'saves the object for all keys' do
+      $cassandra.count_columns(:time, "1").should == @count1 + 1
+      $cassandra.count_columns(:time, "2").should == @count1 + 1
+    end
+  end
+
+  describe '.find' do
+
+    context 'given a simple key' do
+      before do
+        
+      end
+    end
+
+    context 'given a compound key' do
+
+    end
+
+  end
 
   describe '.generate_keys' do
 
-    context 'given a single key part' do
+    context 'given a simple key model' do
       before do
-        @model = SingleKey.new
+        @model = SimpleKey.new
       end
 
       context 'and a single key' do
@@ -46,9 +65,9 @@ describe ActiveColumn::Base do
       end
     end
 
-    context 'given multiple key parts' do
+    context 'given a compound key model' do
       before do
-        @model = MultipleKeys.new
+        @model = CompoundKey.new
       end
 
       context 'and a map of keys' do

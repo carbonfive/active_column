@@ -2,11 +2,11 @@ module ActiveColumn
 
   class Base
 
-    attr_reader :attributes
-
     # @column_family = self.class.name.pluralize.downcase
     @column_family = nil  # todo: should we bring in ActiveSupport *just* for #pluralize ?
     @keys = []
+
+    attr_reader :attributes
 
     def initialize(attrs = {})
       @attributes = attrs
@@ -22,13 +22,9 @@ module ActiveColumn
       @keys = keys
     end
 
-    def self.create(attrs = {})
-      self.new attrs
-    end
-
-    def save(parts)
+    def save(key_parts)
       value = { SimpleUUID::UUID.new => @attributes.to_json }
-      keys = self.class.generate_keys(parts)
+      keys = self.class.generate_keys(key_parts)
 
       keys.each do |key|
         ActiveColumn.connection.insert(self.class.column_family, key, value)
@@ -37,8 +33,8 @@ module ActiveColumn
       self
     end
 
-    def self.find(parts, options = {})
-      keys = generate_keys parts
+    def self.find(key_parts, options = {})
+      keys = generate_keys key_parts
       ActiveColumn.connection.multi_get(column_family, keys, options)
     end
 
@@ -48,19 +44,19 @@ module ActiveColumn
 
     private
 
-    def self.generate_keys(parts)
+    def self.generate_keys(key_parts)
       if keys.size == 1
         part = keys.first
-        value = parts.is_a?(Hash) ? parts[part] : parts
+        value = key_parts.is_a?(Hash) ? key_parts[part] : key_parts
         return value if value.is_a? Array
         return [value]
       end
 
-      values = keys.collect { |k| parts[k] }
-      product = values.reduce do |memo, part|
-        memo = [memo] unless memo.is_a? Array
-        part = [part] unless part.is_a? Array
-        memo.product part
+      values = keys.collect { |k| key_parts[k] }
+      product = values.reduce do |memo, key_part|
+        memo     = [memo]     unless memo.is_a? Array
+        key_part = [key_part] unless key_part.is_a? Array
+        memo.product key_part
       end
 
       product.collect { |p| p.join(':') }
