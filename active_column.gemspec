@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "active_column"
   s.version     = ActiveColumn::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
+  s.authors     = ["Michael Wynholds"]
+  s.email       = ["mike@carbonfive.com"]
   s.homepage    = "http://rubygems.org/gems/active_column"
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Provides time line support for Cassandra}
+  s.description = %q{Provides time line support for Cassandra}
 
   s.rubyforge_project = "active_column"
 
@@ -18,4 +18,9 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.add_dependency 'simple_uuid'
+
+  s.add_development_dependency 'cassandra'
+  s.add_development_dependency 'rspec'
 end
