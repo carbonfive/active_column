@@ -2,10 +2,6 @@ module ActiveColumn
 
   class Base
 
-    # @column_family = self.class.name.pluralize.downcase
-    @column_family = nil  # todo: should we bring in ActiveSupport *just* for #pluralize ?
-    @keys = []
-
     attr_reader :attributes
 
     def initialize(attrs = {})
@@ -17,13 +13,17 @@ module ActiveColumn
       @column_family = column_family
     end
 
-    def self.keys(keys = nil)
-      return @keys if keys.nil?
-      @keys = keys
+    def self.keys(*keys)
+      return @keys if keys.nil? || keys.empty?
+      flattened = ( keys.size == 1 && keys[0].is_a?(Array) ? keys[0] : keys )
+      @keys = flattened.collect { |k| KeyConfig.new(k) }
     end
 
-    def save(key_parts)
-      value = { SimpleUUID::UUID.new => @attributes.to_json }
+    def save()
+      value = { SimpleUUID::UUID.new => self.to_json }
+      key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
+        key_parts[key_config.key] = get_keys(key_config)
+      end
       keys = self.class.generate_keys(key_parts)
 
       keys.each do |key|
@@ -44,15 +44,19 @@ module ActiveColumn
 
     private
 
+    def get_keys(key_config)
+      key_config.func.nil? ? attributes[key_config.key] : self.send(key_config.func)
+    end
+
     def self.generate_keys(key_parts)
       if keys.size == 1
-        part = keys.first
-        value = key_parts.is_a?(Hash) ? key_parts[part] : key_parts
+        key_config = keys.first
+        value = key_parts.is_a?(Hash) ? key_parts[key_config.key] : key_parts
         return value if value.is_a? Array
         return [value]
       end
 
-      values = keys.collect { |k| key_parts[k] }
+      values = keys.collect { |kc| key_parts[kc.key] }
       product = values.reduce do |memo, key_part|
         memo     = [memo]     unless memo.is_a? Array
         key_part = [key_part] unless key_part.is_a? Array
@@ -62,6 +66,23 @@ module ActiveColumn
       product.collect { |p| p.join(':') }
     end
 
+  end
+
+  class KeyConfig
+    attr_accessor :key, :func
+
+    def initialize(key_conf)
+      if key_conf.is_a?(Hash)
+        @key = key_conf.keys[0]
+        @func = key_conf[@key]
+      else
+        @key = key_conf
+      end
+    end
+
+    def to_s
+      "KeyConfig[#{key}, #{func or '-'}]"
+    end
   end
 
 end

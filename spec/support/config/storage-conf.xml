@@ -6,6 +6,8 @@
   <Keyspaces>
     <Keyspace Name="active_column">
       <ColumnFamily Name="time" CompareWith="TimeUUIDType"/>
+      <ColumnFamily Name="tweets" CompareWith="TimeUUIDType"/>
+      <ColumnFamily Name="tweet_dms" CompareWith="TimeUUIDType"/>
       <ReplicaPlacementStrategy>org.apache.cassandra.locator.RackUnawareStrategy</ReplicaPlacementStrategy>
       <ReplicationFactor>1</ReplicationFactor>
       <EndPointSnitch>org.apache.cassandra.locator.EndPointSnitch</EndPointSnitch>
