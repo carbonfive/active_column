@@ -35,7 +35,9 @@ module ActiveColumn
 
     def self.find(key_parts, options = {})
       keys = generate_keys key_parts
-      ActiveColumn.connection.multi_get(column_family, keys, options)
+      ActiveColumn.connection.multi_get(column_family, keys, options).each_with_object( {} ) do |(user, row), results|
+        results[user] = row.to_a.collect { |(_uuid, col)| new(JSON.parse(col)) }
+      end
     end
 
     def to_json(*a)
