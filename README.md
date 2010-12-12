@@ -73,7 +73,7 @@ To make a model in to an ActiveColumn model, just extend ActiveColumn::Base, and
 
 The most basic form of using ActiveColumn looks like this:
 <pre>
-class Tweet < ActiveColumn::Base
+class Tweet &lt; ActiveColumn::Base
   column_family :tweets
   keys :user_id
 end
@@ -95,7 +95,7 @@ basically de-normalizing data, and is extremely common in Cassandra data.  Activ
 by telling it the name of a function to use to generate the keys during a save.  It works like this:
 
 <pre>
-class Tweet < ActiveColumn::Base
+class Tweet &lt; ActiveColumn::Base
   column_family :tweets
   keys :user_id => :generate_user_keys
 
@@ -115,7 +115,7 @@ In some cases you may want to have your rows keyed by multiple values.  ActiveCo
 and looks like this:
 
 <pre>
-class TweetDM < ActiveColumn::Base
+class TweetDM &lt; ActiveColumn::Base
   column_family :tweet_dms
   keys [ { :user_id => :generate_user_keys }, { :recipient_id => :recipient_ids } ]
 
