@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = ActiveColumn::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Wynholds"]
-  s.email       = ["mike@carbonfive.com"]
+  s.email       = ["mike@wynholds.com"]
   s.homepage    = "http://rubygems.org/gems/active_column"
   s.summary     = %q{Provides time line support for Cassandra}
   s.description = %q{Provides time line support for Cassandra}
