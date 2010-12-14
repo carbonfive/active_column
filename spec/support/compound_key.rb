@@ -1,4 +1,6 @@
 class CompoundKey < ActiveColumn::Base
   column_family :time
-  keys :one, :two, :three
+  key :one
+  key :two
+  key :three
 end

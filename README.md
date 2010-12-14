@@ -68,14 +68,15 @@ development and testing.
 ### Saving data
 
 To make a model in to an ActiveColumn model, just extend ActiveColumn::Base, and provide two pieces of information:
-* Column Family
-* Function(s) to generate keys for your rows of data
+
+- Column Family
+- Function(s) to generate keys for your rows of data
 
 The most basic form of using ActiveColumn looks like this:
 <pre>
 class Tweet &lt; ActiveColumn::Base
   column_family :tweets
-  keys :user_id
+  key :user_id
 end
 </pre>
 
@@ -97,7 +98,7 @@ by telling it the name of a function to use to generate the keys during a save. 
 <pre>
 class Tweet &lt; ActiveColumn::Base
   column_family :tweets
-  keys :user_id => :generate_user_keys
+  key :user_id, :values => :generate_user_keys
 
   def generate_user_keys
     [ attributes[:user_id], 'all']
@@ -117,7 +118,8 @@ and looks like this:
 <pre>
 class TweetDM &lt; ActiveColumn::Base
   column_family :tweet_dms
-  keys [ { :user_id => :generate_user_keys }, { :recipient_id => :recipient_ids } ]
+  key :user_id,      :values => :generate_user_keys
+  key :recipient_id, :values => :recipient_ids
 
   def generate_user_keys
     [ attributes[:user_id], 'all ]
@@ -132,10 +134,11 @@ dm = TweetDM.new( :user_id => 'mwynholds', :recipient_ids => [ 'fsinatra', 'dmar
 </pre>
 
 This tweet direct message will saved to four different rows in the "tweet_dms" column family, under these keys:
-* mwynholds:fsinatra
-* mwynholds:dmartin
-* all:fsinatra
-* all:dmartin
+
+- mwynholds:fsinatra
+- mwynholds:dmartin
+- all:fsinatra
+- all:dmartin
 
 Now my app can pretty easily figure find all DMs I sent to Old Blue Eyes, or to Dino, and it can also easily find all
 DMs sent from *anyone* to Frank or Dino.
@@ -147,4 +150,44 @@ are ordered is necessary to keep the compounds keys canonical (ie: deterministic
 
 ### Finding data
 
-Working on this...
+Ok, congratulations - now you have a bunch of fantastic data in Cassandra.  How do you get it out?  ActiveColumn can
+help you here too.
+
+Here is how you look up data that have a simple key:
+
+<pre>
+tweets = Tweet.find( 'mwynholds', :reversed => true, :count => 3 )
+</pre>
+
+This code will find the last 10 tweets for the 'mwynholds' user in reverse order.  It comes back as a hash of arrays,
+and would looks like this if represented in JSON:
+
+<pre>
+{
+  'mwynholds': [ { 'user_id': 'mwynholds', 'message': 'I\'m going to bed now' },
+                 { 'user_id': 'mwynholds', 'message': 'It\'s lunch time' },
+                 { 'user_id': 'mwynholds', 'message': 'Just woke up' } ]
+}
+</pre>
+
+Here are some other examples and their return values:
+
+<pre>
+Tweet.find( [ 'mwynholds', 'all' ], :count => 2 )
+
+{
+  'mwynholds': [ { 'user_id': 'mwynholds', 'message': 'Good morning' },
+                 { 'user_id': 'mwynholds', 'message': 'Good afternoon' } ],
+  'all': [ { 'user_id': 'mwynholds', 'message': 'Good morning' },
+             'user_id': 'bmurray', 'message': 'Who ya gonna call!' } ]
+}
+</pre>
+
+<pre>
+Tweet.find( { 'user_id' => 'all', 'recipient_id' => [ 'fsinatra', 'dmartin' ] }, :reversed => true, :count => 1 )
+
+{
+  'all:fsinatra' => [ { 'user_id': 'mwynholds', 'recipient_ids' => [ 'fsinatra', 'dmartin' ], 'message' => 'Here we come Vegas!' } ],
+  'all:dmartin' => [ { 'user_id': 'fsinatra', 'recipient_ids' => [ 'dmartin' ], 'message' => 'Vegas was fun' } ]
+}
+</pre>

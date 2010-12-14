@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Wynholds"]
   s.email       = ["mike@wynholds.com"]
-  s.homepage    = "http://rubygems.org/gems/active_column"
+  s.homepage    = "https://github.com/carbonfive/active_column"
   s.summary     = %q{Provides time line support for Cassandra}
   s.description = %q{Provides time line support for Cassandra}
 
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'simple_uuid'
-
-  s.add_development_dependency 'cassandra'
+  s.add_dependency 'cassandra'
+  
   s.add_development_dependency 'rspec'
 end
