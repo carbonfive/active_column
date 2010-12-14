@@ -1,6 +1,6 @@
 class Tweet < ActiveColumn::Base
 
   column_family :tweets
-  keys :user_id
+  key :user_id
 
 end

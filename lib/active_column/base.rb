@@ -13,10 +13,9 @@ module ActiveColumn
       @column_family = column_family
     end
 
-    def self.keys(*keys)
-      return @keys if keys.nil? || keys.empty?
-      flattened = ( keys.size == 1 && keys[0].is_a?(Array) ? keys[0] : keys )
-      @keys = flattened.collect { |k| KeyConfig.new(k) }
+    def self.key(key, options = {})
+      @keys ||= []
+      @keys << KeyConfig.new(key, options)
     end
 
     def save()
@@ -46,6 +45,10 @@ module ActiveColumn
 
     private
 
+    def self.keys
+      @keys
+    end
+
     def get_keys(key_config)
       key_config.func.nil? ? attributes[key_config.key] : self.send(key_config.func)
     end
@@ -73,13 +76,9 @@ module ActiveColumn
   class KeyConfig
     attr_accessor :key, :func
 
-    def initialize(key_conf)
-      if key_conf.is_a?(Hash)
-        @key = key_conf.keys[0]
-        @func = key_conf[@key]
-      else
-        @key = key_conf
-      end
+    def initialize(key, options)
+      @key = key
+      @func = options[:values]
     end
 
     def to_s
