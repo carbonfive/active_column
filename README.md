@@ -77,6 +77,20 @@ The most basic form of using ActiveColumn looks like this:
 class Tweet &lt; ActiveColumn::Base
   column_family :tweets
   key :user_id
+
+  attr_accessor :user_id, :message
+end
+</pre>
+
+Note that you can also use ActiveColumn as a mix-in, like this:
+<pre>
+class Tweet
+  include ActiveColumn
+
+  column_family :tweets
+  key :user_id
+
+  attr_accessor :user_id, :message
 end
 </pre>
 
@@ -100,8 +114,10 @@ class Tweet &lt; ActiveColumn::Base
   column_family :tweets
   key :user_id, :values => :generate_user_keys
 
+  attr_accessor :user_id, :message
+
   def generate_user_keys
-    [ attributes[:user_id], 'all']
+    [ user_id, 'all']
   end
 end
 </pre>
@@ -121,8 +137,10 @@ class TweetDM &lt; ActiveColumn::Base
   key :user_id,      :values => :generate_user_keys
   key :recipient_id, :values => :recipient_ids
 
+  attr_accessor :user_id, :recipient_ids, :message
+
   def generate_user_keys
-    [ attributes[:user_id], 'all ]
+    [ user_id, 'all ]
   end
 end
 </pre>
