@@ -1,6 +1,6 @@
-class TweetDM < ActiveColumn::Base
+class TweetDM
+  include ActiveColumn
 
-  column_family :tweet_dms
   key :user_id,      :values => :user_keys
   key :recipient_id, :values => :recipient_keys
 

@@ -9,7 +9,7 @@ module ActiveColumn
   module ClassMethods
 
     def column_family(column_family = nil)
-      return @column_family if column_family.nil?
+      return @column_family || self.name.tableize.to_sym if column_family.nil?
       @column_family = column_family
     end
 

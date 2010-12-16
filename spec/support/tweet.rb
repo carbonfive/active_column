@@ -1,6 +1,6 @@
-class Tweet < ActiveColumn::Base
+class Tweet
+  include ActiveColumn
 
-  column_family :tweets
   key :user_id
 
   attr_accessor :user_id, :message
