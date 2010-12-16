@@ -20,6 +20,17 @@ describe ActiveColumn::Base do
         end
       end
 
+      context 'and an attribute key function (via mixin)' do
+        before do
+          TweetMix.new( user_id: 'user1', message: 'just woke up' ).save
+          TweetMix.new( user_id: 'user2', message: 'kinda hungry' ).save
+        end
+
+        it 'saves the model for the key' do
+          @counter.diff.should == [1, 1, 0]
+        end
+      end
+
       context 'and a custom key function' do
         before do
           AggregatingTweet.new( user_id: 'user1', message: 'just woke up' ).save
