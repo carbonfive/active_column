@@ -20,7 +20,7 @@ describe ActiveColumn::Base do
         it 'find all of the models' do
           @found.size.should == 1
           @found['user1'].size.should == 3
-          @found['user1'].collect { |t| t.attributes['message'] }.should == [ 'Now im full', 'Now im hungry', 'Going running' ]
+          @found['user1'].collect { |t| t.message }.should == [ 'Now im full', 'Now im hungry', 'Going running' ]
         end
       end
 
@@ -31,8 +31,8 @@ describe ActiveColumn::Base do
 
         it 'finds all of the models' do
           @found.size.should == 2
-          @found['user1'].collect { |t| t.attributes['message'] }.should == [ 'Now im full' ]
-          @found['user2'].collect { |t| t.attributes['message'] }.should == [ 'Watching TV' ]
+          @found['user1'].collect { |t| t.message }.should == [ 'Now im full' ]
+          @found['user2'].collect { |t| t.message }.should == [ 'Watching TV' ]
         end
       end
     end
@@ -50,9 +50,9 @@ describe ActiveColumn::Base do
 
         it 'finds all of the models' do
           @found.size.should == 6
-          @found['user1:friend1'].collect { |t| t.attributes['message'] }.should == [ 'Need to do laundry' ]
-          @found['user1:friend2'].collect { |t| t.attributes['message'] }.should == [ 'My leg itches' ]
-          @found['user1:all'].collect { |t| t.attributes['message'] }.should == [ 'My leg itches' ]
+          @found['user1:friend1'].collect { |t| t.message }.should == [ 'Need to do laundry' ]
+          @found['user1:friend2'].collect { |t| t.message }.should == [ 'My leg itches' ]
+          @found['user1:all'].collect { |t| t.message }.should == [ 'My leg itches' ]
           @found['user2:friend1'].should == []
           @found['user2:friend2'].should == []
           @found['user2:all'].should == []
