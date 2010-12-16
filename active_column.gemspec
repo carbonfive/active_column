@@ -20,7 +20,10 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'simple_uuid'
-  s.add_dependency 'cassandra'
+  s.add_dependency 'cassandra', '~> 0.9'
+  s.add_dependency 'json'
+  s.add_dependency 'activesupport'
+  s.add_dependency 'i18n'
   
   s.add_development_dependency 'rspec'
 end

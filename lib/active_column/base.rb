@@ -1,11 +1,13 @@
+require 'active_support'
+
 module ActiveColumn
 
   class Base
 
-    attr_reader :attributes
-
     def initialize(attrs = {})
-      @attributes = attrs
+      attrs.each do |attr, value|
+        send("#{attr}=", value) if respond_to?("#{attr}=")
+      end
     end
 
     def self.column_family(column_family = nil)
@@ -19,7 +21,7 @@ module ActiveColumn
     end
 
     def save()
-      value = { SimpleUUID::UUID.new => self.to_json }
+      value = { SimpleUUID::UUID.new => ActiveSupport::JSON.encode(self) }
       key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
         key_parts[key_config.key] = get_keys(key_config)
       end
@@ -35,12 +37,8 @@ module ActiveColumn
     def self.find(key_parts, options = {})
       keys = generate_keys key_parts
       ActiveColumn.connection.multi_get(column_family, keys, options).each_with_object( {} ) do |(user, row), results|
-        results[user] = row.to_a.collect { |(_uuid, col)| new(JSON.parse(col)) }
+        results[user] = row.to_a.collect { |(_uuid, col)| new(ActiveSupport::JSON.decode(col)) }
       end
-    end
-
-    def to_json(*a)
-      @attributes.to_json(*a)
     end
 
     private
@@ -50,7 +48,7 @@ module ActiveColumn
     end
 
     def get_keys(key_config)
-      key_config.func.nil? ? attributes[key_config.key] : self.send(key_config.func)
+      self.send(key_config.func)
     end
 
     def self.generate_keys(key_parts)
@@ -78,7 +76,7 @@ module ActiveColumn
 
     def initialize(key, options)
       @key = key
-      @func = options[:values]
+      @func = options[:values] || key
     end
 
     def to_s
