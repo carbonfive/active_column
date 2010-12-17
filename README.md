@@ -69,15 +69,17 @@ development and testing.
 
 To make a model in to an ActiveColumn model, just extend ActiveColumn::Base, and provide two pieces of information:
 
-- Column Family
+- Column Family (optional)
 - Function(s) to generate keys for your rows of data
+
+If you do not specify a column family, it will default to the "tabelized" class name, just like ActiveRecord.
+Example: Tweet --> tweets
+Example: TweetDM --> tweet_dms
 
 The most basic form of using ActiveColumn looks like this:
 <pre>
 class Tweet &lt; ActiveColumn::Base
-  column_family :tweets
   key :user_id
-
   attr_accessor :user_id, :message
 end
 </pre>
@@ -87,9 +89,7 @@ Note that you can also use ActiveColumn as a mix-in, like this:
 class Tweet
   include ActiveColumn
 
-  column_family :tweets
   key :user_id
-
   attr_accessor :user_id, :message
 end
 </pre>
@@ -110,10 +110,10 @@ basically de-normalizing data, and is extremely common in Cassandra data.  Activ
 by telling it the name of a function to use to generate the keys during a save.  It works like this:
 
 <pre>
-class Tweet &lt; ActiveColumn::Base
-  column_family :tweets
-  key :user_id, :values => :generate_user_keys
+class Tweet
+  include ActiveColumn
 
+  key :user_id, :values => :generate_user_keys
   attr_accessor :user_id, :message
 
   def generate_user_keys
@@ -132,11 +132,12 @@ In some cases you may want to have your rows keyed by multiple values.  ActiveCo
 and looks like this:
 
 <pre>
-class TweetDM &lt; ActiveColumn::Base
+class TweetDM
+  include ActiveColumn
+
   column_family :tweet_dms
   key :user_id,      :values => :generate_user_keys
   key :recipient_id, :values => :recipient_ids
-
   attr_accessor :user_id, :recipient_ids, :message
 
   def generate_user_keys
