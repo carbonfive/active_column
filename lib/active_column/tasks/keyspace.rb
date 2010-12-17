@@ -23,6 +23,10 @@ module ActiveColumn
         @cassandra.add_keyspace ks
       end
 
+      def drop(name)
+        @cassandra.drop_keyspace name.to_s
+      end
+
       def set(name)
         @cassandra.keyspace = name.to_s
       end
