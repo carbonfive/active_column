@@ -2,15 +2,6 @@ require 'spec_helper'
 
 describe ActiveColumn::Base do
 
-  before do
-    [:tweets, :tweet_dms].each do |name|
-      cf = Cassandra::ColumnFamily.new
-      cf.name = name.to_s
-      cf.keyspace = 'active_column'
-      cf.comparator_type = 'TimeUUIDType'
-      $cassandra.add_column_family cf
-    end
-  end
   describe '#save' do
 
     context 'given a model with a single key' do

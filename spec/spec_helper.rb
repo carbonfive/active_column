@@ -5,39 +5,24 @@ Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
 $cassandra = ActiveColumn.connection = Cassandra.new('system', '127.0.0.1:9160')
 
+ks_tasks = ActiveColumn::Tasks::Keyspace.new $cassandra
+unless ks_tasks.exists?('active_column')
+  ks_tasks.create('active_column')
+
+  cf_tasks = ActiveColumn::Tasks::ColumnFamily.new $cassandra
+  [:tweets, :tweet_dms].each do |cf|
+    cf_tasks.create(cf, :keyspace => 'active_column')
+  end
+end
+
+ks_tasks.set 'active_column'
+ks_tasks.clear
+
 RSpec.configure do |config|
 
   config.before do
-    Cleaner.drop
-    Cleaner.create
-    $cassandra.keyspace = 'active_column'
   end
-
-end
-
-class Cleaner
-  def self.create
-    # unless $cassandra.keyspaces.include? 'active_column'
-      ks = Cassandra::Keyspace.new
-      ks.name = 'active_column'
-      ks.strategy_class = 'org.apache.cassandra.locator.LocalStrategy'
-      ks.replication_factor = 1
-      ks.cf_defs = []
-      $cassandra.add_keyspace ks
-    # end
-  end
-
-  def self.clean
-    $cassandra.clear_keyspace!
-    schema = $cassandra.schema
-    schema.cf_defs.each do |cf_def|
-      $cassandra.drop_column_family cf_def.name
-    end
-  end
-
-  def self.drop
-    $cassandra.drop_keyspace 'active_column'
-  end
+  
 end
 
 class Counter
@@ -58,8 +43,7 @@ class Counter
 
   def get_counts
     @keys.each_with_object( {} ) do |key, counts|
-      p "CF: #{@cf}, Key: #{key}"
-      counts[key] = $cassandra.count_columns(@cf, key, {})
+      counts[key] = $cassandra.get(@cf, key).length
     end
   end
 end
