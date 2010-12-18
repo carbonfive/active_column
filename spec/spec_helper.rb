@@ -1,15 +1,14 @@
-require 'cassandra/0.7'
 require 'active_column'
 
 Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
 $cassandra = ActiveColumn.connection = Cassandra.new('system', '127.0.0.1:9160')
 
-ks_tasks = ActiveColumn::Tasks::Keyspace.new $cassandra
+ks_tasks = ActiveColumn::Tasks::Keyspace.new
 unless ks_tasks.exists?('active_column')
   ks_tasks.create('active_column')
 
-  cf_tasks = ActiveColumn::Tasks::ColumnFamily.new $cassandra
+  cf_tasks = ActiveColumn::Tasks::ColumnFamily.new
   [:tweets, :tweet_dms].each do |cf|
     cf_tasks.create(cf, :keyspace => 'active_column')
   end

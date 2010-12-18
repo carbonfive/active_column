@@ -1,3 +1,6 @@
+require 'cassandra/0.7'
+require 'active_column/tasks/ks'
+
 module ActiveColumn
 
   autoload :Connection,     'active_column/connection'
@@ -9,7 +12,6 @@ module ActiveColumn
     autoload :Keyspace,     'active_column/tasks/keyspace'
     autoload :ColumnFamily, 'active_column/tasks/column_family'
   end
-
 
   extend Connection
   

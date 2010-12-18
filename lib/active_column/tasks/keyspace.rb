@@ -1,13 +1,11 @@
-require 'cassandra/0.7'
-
 module ActiveColumn
 
   module Tasks
 
     class Keyspace
 
-      def initialize(cassandra)
-        @cassandra = cassandra
+      def initialize
+        @cassandra = ActiveColumn.connection
       end
 
       def exists?(name)

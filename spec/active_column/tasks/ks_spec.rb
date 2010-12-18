@@ -3,7 +3,7 @@ require 'spec_helper'
 describe ActiveColumn::Tasks::Keyspace do
 
   before do
-    @ks = ActiveColumn::Tasks::Keyspace.new $cassandra
+    @ks = ActiveColumn::Tasks::Keyspace.new
   end
 
   describe ".create" do
