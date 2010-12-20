@@ -1,5 +1,3 @@
-require 'active_support'
-
 module ActiveColumn
 
   def self.included(base)

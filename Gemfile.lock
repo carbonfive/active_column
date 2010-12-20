@@ -4,13 +4,17 @@ PATH
     active_column (0.0.3)
       activesupport
       cassandra (~> 0.9)
-      i18n
-      json
-      simple_uuid
+      rake
 
 GEM
   remote: http://rubygems.org/
   specs:
+    ParseTree (3.0.6)
+      RubyInline (>= 3.7.0)
+      sexp_processor (>= 3.0.0)
+    RubyInline (3.8.6)
+      ZenTest (~> 4.3)
+    ZenTest (4.4.2)
     activesupport (3.0.3)
     cassandra (0.9.0)
       json
@@ -18,8 +22,10 @@ GEM
       simple_uuid (>= 0.1.0)
       thrift_client (>= 0.6.0)
     diff-lcs (1.1.2)
-    i18n (0.5.0)
+    file-tail (1.0.5)
+      spruz (>= 0.1.0)
     json (1.4.6)
+    predicated (0.2.2)
     rake (0.8.7)
     rspec (2.2.0)
       rspec-core (~> 2.2)
@@ -29,10 +35,29 @@ GEM
     rspec-expectations (2.2.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.2.0)
+    ruby2ruby (1.2.5)
+      ruby_parser (~> 2.0)
+      sexp_processor (~> 3.0)
+    ruby_parser (2.0.5)
+      sexp_processor (~> 3.0)
+    sexp_processor (3.0.5)
     simple_uuid (0.1.1)
+    sourcify (0.4.0)
+      ruby2ruby (>= 1.2.5)
+      sexp_processor (>= 3.0.5)
+    spruz (0.2.2)
     thrift (0.5.0)
     thrift_client (0.6.0)
       thrift (~> 0.5.0)
+    wrong (0.5.0)
+      ParseTree (~> 3.0)
+      diff-lcs (~> 1.1.2)
+      file-tail (~> 1.0)
+      predicated (>= 0.2.2)
+      ruby2ruby (~> 1.2)
+      ruby_parser (~> 2.0.4)
+      sexp_processor (~> 3.0)
+      sourcify (>= 0.3.0)
 
 PLATFORMS
   ruby
@@ -41,7 +66,6 @@ DEPENDENCIES
   active_column!
   activesupport
   cassandra (~> 0.9)
-  i18n
-  json
+  rake
   rspec
-  simple_uuid
+  wrong
