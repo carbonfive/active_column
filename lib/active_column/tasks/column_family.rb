@@ -15,13 +15,17 @@ module ActiveColumn
       def create(name, options = {})
         cf = Cassandra::ColumnFamily.new
         cf.name = name.to_s
-        cf.keyspace = options[:keyspace]
+        cf.keyspace = options[:keyspace] || @cassandra.keyspace
         cf.comparator_type = options[:comparator_type] || 'TimeUUIDType'
         @cassandra.add_column_family(cf)
       end
 
       def drop(name)
         @cassandra.drop_column_family(name.to_s)
+      end
+
+      def clear(name)
+        @cassandra.truncate!(name.to_s)
       end
 
     end
