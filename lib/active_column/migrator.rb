@@ -157,7 +157,7 @@ module ActiveColumn
       runnable.pop if down? && !target.nil?
 
       runnable.each do |migration|
-        puts "Migrating to #{migration.name} (#{migration.version})"
+        #puts "Migrating to #{migration.name} (#{migration.version})"
 
         # On our way up, we skip migrating the ones we've already migrated
         next if up? && migrated.include?(migration.version.to_i)
@@ -221,7 +221,7 @@ module ActiveColumn
       @migrated_versions ||= []
       if down?
         @migrated_versions.delete(migration.version)
-        cas.remove sm_cf, 'all', :start => migration.version, :finish => migration.version
+        cas.remove sm_cf, 'all', migration.version
       else
         @migrated_versions.push(migration.version).sort!
         cas.insert sm_cf, 'all', { migration.version => migration.name }

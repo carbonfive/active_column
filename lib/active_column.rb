@@ -1,4 +1,5 @@
 require 'cassandra/0.7'
+require 'active_support'
 require 'active_support/core_ext/string'
 
 module ActiveColumn
