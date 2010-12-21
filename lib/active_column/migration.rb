@@ -58,14 +58,14 @@ module ActiveColumn
 
     private
 
-      def migration
-        @migration ||= load_migration
-      end
+    def migration
+      @migration ||= load_migration
+    end
 
-      def load_migration
-        require(File.expand_path(filename))
-        name.constantize
-      end
+    def load_migration
+      require(File.expand_path(filename))
+      name.constantize
+    end
 
   end
 
@@ -83,11 +83,11 @@ module ActiveColumn
       end
     end
 
-    def self.rollback(migrations_path, steps=1)
+    def self.rollback(migrations_path, steps = 1)
       move(:down, migrations_path, steps)
     end
 
-    def self.forward(migrations_path, steps=1)
+    def self.forward(migrations_path, steps = 1)
       move(:up, migrations_path, steps)
     end
 
@@ -125,6 +125,21 @@ module ActiveColumn
         0
       end
     end
+
+    private
+
+    def self.move(direction, migrations_path, steps)
+      migrator = self.new(direction, migrations_path)
+      start_index = migrator.migrations.index(migrator.current_migration)
+
+      if start_index
+        finish = migrator.migrations[start_index + steps]
+        version = finish ? finish.version : 0
+        send(direction, migrations_path, version)
+      end
+    end
+
+    public
 
     def initialize(direction, migrations_path, target_version = nil)
       cf = ActiveColumn::Tasks::ColumnFamily.new

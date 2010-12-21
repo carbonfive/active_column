@@ -3,47 +3,34 @@ require 'wrong'
 require 'wrong/adapters/rspec'
 Wrong.config.alias_assert :expect
 
+module ActiveColumn
+  class MigratorSpecHelper
+    attr_accessor :data
+    def initialize
+      @data = {}
+    end
+  end
+end
+
+migrations_path = File.expand_path("../../support/migrate", __FILE__)
+$migrator_spec_helper = ActiveColumn::MigratorSpecHelper.new
+
+def get_migrations
+  $cassandra.get(:schema_migrations, 'all').map {|name, _value| name.to_i}
+end
+
+def get_data
+  $migrator_spec_helper.data.keys.sort
+end
+
 describe ActiveColumn::Migrator do
 
-  migrations_path = File.expand_path("../../support/migrate", __FILE__)
-
-  def get_migrations
-    $cassandra.get(:schema_migrations, 'all').map {|name, _value| name.to_i}
-  end
-
-  def drop_cf(cf)
-    $cassandra.truncate!(cf.to_s)
-    $cassandra.drop_column_family(cf.to_s)
-  end
-
-  def assert_cf(cf)
-    cfs = $cassandra.schema.cf_defs.collect { |c| c.name }
-    assert { cfs.include?(cf.to_s) }
-  end
-
-  def assert_no_cf(cf)
-    cfs = $cassandra.schema.cf_defs.collect { |c| c.name }
-    assert { ! cfs.include?(cf.to_s) }
-  end
-
-  def assert_rows(cf, *rows)
-    rows.each do |row|
-      assert { $cassandra.get(cf, row.to_s).length == 1 }
-    end
-  end
-
-  def assert_no_rows(cf, *rows)
-    rows.each do |row|
-      assert { $cassandra.get(cf, row.to_s).length == 0 }
-    end
+  after do
+    $cassandra.truncate!("schema_migrations")
+    $migrator_spec_helper.data.clear
   end
 
   describe '.migrate' do
-
-    after do
-      $cassandra.truncate!("schema_migrations")
-    end
-
     context 'given no previous migrations' do
       context 'and some pending migrations' do
         context 'and no target version' do
@@ -51,17 +38,12 @@ describe ActiveColumn::Migrator do
             ActiveColumn::Migrator.migrate(migrations_path)
           end
 
-          after do
-            drop_cf :test1
-          end
-
           it 'adds the migrations to the schema_migrations CF' do
             assert { get_migrations == [1, 2, 3, 4] }
           end
 
           it 'runs the migrations' do
-            assert_cf :test1
-            assert_rows :test1, 1, 2, 3
+            assert { get_data == [1, 2, 3, 4] }
           end
         end
 
@@ -70,17 +52,12 @@ describe ActiveColumn::Migrator do
             ActiveColumn::Migrator.migrate(migrations_path, 2)
           end
 
-          after do
-            drop_cf :test1
-          end
-
           it 'adds the migrations to the schema_migrations CF' do
             assert { get_migrations == [1, 2] }
           end
 
           it 'runs the migrations' do
-            assert_cf :test1
-            assert_rows :test1, 1
+            assert { get_data == [1, 2] }
           end
         end
 
@@ -88,7 +65,7 @@ describe ActiveColumn::Migrator do
 
       context 'and no pending migrations' do
         before do
-          ActiveColumn::Migrator.migrate(File.expand_path("..", migrations_path))
+          ActiveColumn::Migrator.migrate(File.expand_path("./fake", migrations_path))
         end
 
         it 'adds no migrations to the schema_migrations CF' do
@@ -96,7 +73,7 @@ describe ActiveColumn::Migrator do
         end
 
         it 'runs no migrations' do
-          assert_no_cf :test1
+          assert { get_data == [] }
         end
       end
     end
@@ -104,10 +81,6 @@ describe ActiveColumn::Migrator do
     context 'given some previous migrations' do
       before do
         ActiveColumn::Migrator.migrate(migrations_path, 2)
-      end
-
-      after do
-        drop_cf :test1
       end
 
       context 'and no target version' do
@@ -120,8 +93,7 @@ describe ActiveColumn::Migrator do
         end
 
         it 'runs the migrations' do
-          assert_cf :test1
-          assert_rows :test1, 1, 2, 3
+          assert { get_data == [1, 2, 3, 4]}
         end
       end
 
@@ -135,8 +107,7 @@ describe ActiveColumn::Migrator do
         end
 
         it 'runs the migrations' do
-          assert_cf :test1
-          assert_rows :test1, 1, 2
+          assert { get_data == [1, 2, 3] }
         end
       end
 
@@ -146,16 +117,70 @@ describe ActiveColumn::Migrator do
         end
 
         it 'removes the migrations from the schema_migrations CF' do
-          assert { get_migrations == [1] }  
+          assert { get_migrations == [1] }
         end
 
         it 'rolls back the migrations' do
-          assert_cf :test1
-          assert_no_rows :test1, 1
+          assert { get_data == [1] }
         end
       end
     end
+  end
 
+  describe '.rollback' do
+    before do
+      ActiveColumn::Migrator.migrate migrations_path, 3
+    end
+
+    context 'given no steps' do
+      before do
+        ActiveColumn::Migrator.rollback migrations_path
+      end
+
+      it 'rolls back one step' do
+        assert { get_migrations == [1, 2] }
+        assert { get_data       == [1, 2] }
+      end
+    end
+
+    context 'given steps = 2' do
+      before do
+        ActiveColumn::Migrator.rollback migrations_path, 2
+      end
+
+      it 'rolls back two steps' do
+        assert { get_migrations == [1] }
+        assert { get_data       == [1] }
+      end
+    end
+  end
+
+  describe '.forward' do
+    before do
+      ActiveColumn::Migrator.migrate migrations_path, 1
+    end
+
+    context 'given no steps' do
+      before do
+        ActiveColumn::Migrator.forward migrations_path
+      end
+
+      it 'migrates one step' do
+        assert { get_migrations == [1, 2] }
+        assert { get_data       == [1, 2] }
+      end
+    end
+
+    context 'given steps = 2' do
+      before do
+        ActiveColumn::Migrator.forward migrations_path, 2
+      end
+
+      it 'migrates two steps' do
+        assert { get_migrations == [1, 2, 3] }
+        assert { get_data       == [1, 2, 3] }
+      end
+    end
   end
 
 end
