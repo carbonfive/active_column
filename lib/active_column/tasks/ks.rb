@@ -5,29 +5,39 @@ namespace :ks do
   desc 'Create the keyspace in config/cassandra.yml for the current environment'
   task :create => :environment do
     config = load_config[Rails.env || 'development']
-    ActiveColumn::Tasks::Keyspace.new.create config['keyspace'], config
+    ks = config['keyspace']
+    ActiveColumn::Tasks::Keyspace.new.create ks, config
+    puts "Created keyspace: #{ks}"
   end
 
   desc 'Create keyspaces in config/cassandra.yml for all environments'
   task 'create:all' => :environment do
     config = load_config
+    kss = []
     config.keys.each do |env|
-      ActiveColumn::Tasks::Keyspace.new.create config[env]['keyspace'], config
+      kss << config[env]['keyspace']
+      ActiveColumn::Tasks::Keyspace.new.create kss.last, config
     end
+    puts "Created keyspaces: #{kss.join(', ')}"
   end
 
   desc 'Drop keyspace in config/cassandra.yml for the current environment'
   task :drop => :environment do
     config = load_config[Rails.env || 'development']
-    ActiveColumn::Tasks::Keyspace.new.drop config['keyspace']
+    ks = config['keyspace']
+    ActiveColumn::Tasks::Keyspace.new.drop ks
+    puts "Dropped keyspace: #{ks}"
   end
 
   desc 'Drop keyspaces in config/cassandra.yml for all environments'
   task 'drop:all' => :environment do
     config = load_config
+    kss = []
     config.keys.each do |env|
-      ActiveColumn::Tasks::Keyspace.new.drop config[env]['keyspace'], config
+      kss << config[env]['keyspace']
+      ActiveColumn::Tasks::Keyspace.new.drop kss.last
     end
+    puts "Dropped keyspaces: #{kss.join(', ')}"
   end
 
   desc 'Migrate the keyspace (options: VERSION=x)'
