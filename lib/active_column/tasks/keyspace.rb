@@ -5,7 +5,9 @@ module ActiveColumn
     class Keyspace
 
       def initialize
-        @cassandra = ActiveColumn.connection
+        #@cassandra = ActiveColumn.connection
+        c = ActiveColumn.connection
+        @cassandra = Cassandra.new('system', c.servers, c.thrift_client_options)
       end
 
       def exists?(name)
@@ -34,6 +36,8 @@ module ActiveColumn
       end
 
       def clear
+        return puts 'Cannot clear system keyspace' if @cassandra.keyspace == 'system'
+
         @cassandra.clear_keyspace!
       end
 
