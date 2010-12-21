@@ -10,13 +10,17 @@ module ActiveColumn
   autoload :Version,        'active_column/version'
 
   require                   'active_column/errors'
-  require 'active_column/migration'
+  require                   'active_column/migration'
 
   module Tasks
     autoload :Keyspace,     'active_column/tasks/keyspace'
     autoload :ColumnFamily, 'active_column/tasks/column_family'
 
     require                 'active_column/tasks/ks'
+  end
+
+  module Generators
+    require                 'active_column/generators/migration_generator'
   end
 
   extend Connection
