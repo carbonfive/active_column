@@ -6,13 +6,43 @@ Wrong.config.alias_assert :expect
 describe ActiveColumn::Migrator do
 
   migrations_path = File.expand_path("../../support/migrate", __FILE__)
-  cf = ActiveColumn::Tasks::ColumnFamily.new
 
   def get_migrations
     $cassandra.get(:schema_migrations, 'all').map {|name, _value| name.to_i}
   end
 
+  def drop_cf(cf)
+    $cassandra.truncate!(cf.to_s)
+    $cassandra.drop_column_family(cf.to_s)
+  end
+
+  def assert_cf(cf)
+    cfs = $cassandra.schema.cf_defs.collect { |c| c.name }
+    assert { cfs.include?(cf.to_s) }
+  end
+
+  def assert_no_cf(cf)
+    cfs = $cassandra.schema.cf_defs.collect { |c| c.name }
+    assert { ! cfs.include?(cf.to_s) }
+  end
+
+  def assert_rows(cf, *rows)
+    rows.each do |row|
+      assert { $cassandra.get(cf, row.to_s).length == 1 }
+    end
+  end
+
+  def assert_no_rows(cf, *rows)
+    rows.each do |row|
+      assert { $cassandra.get(cf, row.to_s).length == 0 }
+    end
+  end
+
   describe '.migrate' do
+
+    after do
+      $cassandra.truncate!("schema_migrations")
+    end
 
     context 'given no previous migrations' do
       context 'and some pending migrations' do
@@ -22,24 +52,17 @@ describe ActiveColumn::Migrator do
           end
 
           after do
-            cf.clear :schema_migrations
-            cf.drop :schema_migrations
-          end
-
-          it 'creates a schema_migrations CF' do
-            assert { cf.exists?(:schema_migrations) != nil }
+            drop_cf :test1
           end
 
           it 'adds the migrations to the schema_migrations CF' do
             assert { get_migrations == [1, 2, 3, 4] }
           end
 
-          it 'runs the migrations'
-
-#          it 'runs the migrations' do
-#            assert { cf.exists?(:test1) != nil }
-#            assert { cf.exists?(:test2) != nil }
-#          end
+          it 'runs the migrations' do
+            assert_cf :test1
+            assert_rows :test1, 1, 2, 3
+          end
         end
 
         context 'and a target version up' do
@@ -48,16 +71,16 @@ describe ActiveColumn::Migrator do
           end
 
           after do
-            cf.clear :schema_migrations
-            cf.drop :schema_migrations
-          end
-
-          it 'creates a schema_migrations CF' do
-            assert { cf.exists?(:schema_migrations) != nil }
+            drop_cf :test1
           end
 
           it 'adds the migrations to the schema_migrations CF' do
             assert { get_migrations == [1, 2] }
+          end
+
+          it 'runs the migrations' do
+            assert_cf :test1
+            assert_rows :test1, 1
           end
         end
 
@@ -68,17 +91,12 @@ describe ActiveColumn::Migrator do
           ActiveColumn::Migrator.migrate(File.expand_path("..", migrations_path))
         end
 
-        after do
-          cf.clear :schema_migrations
-          cf.drop :schema_migrations
-        end
-
-        it 'creates a schema_migrations CF' do
-          assert { cf.exists?(:schema_migrations) != nil }
-        end
-
         it 'adds no migrations to the schema_migrations CF' do
           assert { get_migrations == [] }
+        end
+
+        it 'runs no migrations' do
+          assert_no_cf :test1
         end
       end
     end
@@ -89,8 +107,7 @@ describe ActiveColumn::Migrator do
       end
 
       after do
-        cf.clear :schema_migrations
-        cf.drop :schema_migrations
+        drop_cf :test1
       end
 
       context 'and no target version' do
@@ -102,7 +119,10 @@ describe ActiveColumn::Migrator do
           assert { get_migrations == [1, 2, 3, 4]}
         end
 
-        it 'runs the migrations'
+        it 'runs the migrations' do
+          assert_cf :test1
+          assert_rows :test1, 1, 2, 3
+        end
       end
 
       context 'and a target version up' do
@@ -114,7 +134,10 @@ describe ActiveColumn::Migrator do
           assert { get_migrations == [1, 2, 3] }
         end
 
-        it 'runs the migrations'
+        it 'runs the migrations' do
+          assert_cf :test1
+          assert_rows :test1, 1, 2
+        end
       end
 
       context 'and a target version down' do
@@ -126,7 +149,10 @@ describe ActiveColumn::Migrator do
           assert { get_migrations == [1] }  
         end
 
-        it 'rolls back the migrations'
+        it 'rolls back the migrations' do
+          assert_cf :test1
+          assert_no_rows :test1, 1
+        end
       end
     end
 

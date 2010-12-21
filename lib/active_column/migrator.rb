@@ -29,8 +29,21 @@ module ActiveColumn
 
   class Migration
 
+    def self.connection
+      $cassandra
+    end
+
     def self.migrate(direction)
-      
+      return unless respond_to?(direction)
+      send direction
+    end
+
+    def self.create_column_family(name, options = {})
+      ActiveColumn::Tasks::ColumnFamily.new.create(name, options)
+    end
+
+    def self.drop_column_family(name)
+      ActiveColumn::Tasks::ColumnFamily.new.drop(name)
     end
 
   end
