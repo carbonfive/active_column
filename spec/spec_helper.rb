@@ -2,6 +2,9 @@ require 'active_column'
 require 'rails'
 require 'rspec-rails'
 require 'rspec/rails/adapters'
+require 'wrong/adapters/rspec'
+
+Wrong.config.alias_assert :expect
 
 Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
