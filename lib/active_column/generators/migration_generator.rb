@@ -23,7 +23,7 @@ EOF
 
       def create
         timestamp = Time.now.utc.strftime("%Y%m%d%H%M%S")
-        template 'migration.rb.erb', "ks/migrate/#{timestamp}_#{singular_table_name}.rb"
+        template 'migration.rb.erb', "ks/migrate/#{timestamp}_#{file_name.tableize}.rb"
       end
 
     end
