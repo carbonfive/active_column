@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Michael Wynholds"]
   s.email       = ["mike@wynholds.com"]
   s.homepage    = "https://github.com/carbonfive/active_column"
-  s.summary     = %q{Provides time line support for Cassandra}
-  s.description = %q{Provides time line support for Cassandra}
+  s.summary     = %q{Provides time line support and database migrations for Cassandra}
+  s.description = %q{Provides time line support and database migrations for Cassandra}
 
   s.rubyforge_project = "active_column"
 
@@ -19,10 +19,11 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'cassandra', '~> 0.9'
+  s.add_dependency 'cassandra', '>= 0.9'
   s.add_dependency 'activesupport'
   s.add_dependency 'rake'
-  
-  s.add_development_dependency 'rspec'
+
+  s.add_development_dependency 'rails', '>= 3.0'
+  s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'wrong'
 end

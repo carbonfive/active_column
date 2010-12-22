@@ -1,8 +1,11 @@
 require 'active_column'
+require 'rails'
+require 'rspec-rails'
+require 'rspec/rails/adapters'
 
 Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
-$cassandra = ActiveColumn.connection = Cassandra.new('system', '127.0.0.1:9160')
+$cassandra = ActiveColumn.connection = Cassandra.new('active_column', '127.0.0.1:9160')
 
 ks_tasks = ActiveColumn::Tasks::Keyspace.new
 unless ks_tasks.exists?('active_column')
