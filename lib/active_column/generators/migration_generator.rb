@@ -22,8 +22,6 @@ EOF
       end
 
       def create
-        puts "Creating Cassandra migration..."
-
         timestamp = Time.now.utc.strftime("%Y%m%d%H%M%S")
         template 'migration.rb.erb', "ks/migrate/#{timestamp}_#{singular_table_name}.rb"
       end

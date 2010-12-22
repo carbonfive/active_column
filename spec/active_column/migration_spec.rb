@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'wrong'
 require 'wrong/adapters/rspec'
 Wrong.config.alias_assert :expect
 
