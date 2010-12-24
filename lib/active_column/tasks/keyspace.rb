@@ -5,7 +5,6 @@ module ActiveColumn
     class Keyspace
 
       def initialize
-        #@cassandra = ActiveColumn.connection
         c = ActiveColumn.connection
         @cassandra = Cassandra.new('system', c.servers, c.thrift_client_options)
       end
@@ -15,11 +14,12 @@ module ActiveColumn
       end
 
       def create(name, options = {})
-        ks = Cassandra::Keyspace.new
-        ks.name = name.to_s
-        ks.strategy_class = options[:strategy_class] || 'org.apache.cassandra.locator.LocalStrategy'
-        ks.replication_factor = options[:replication_factor] || 1
-        ks.cf_defs = []
+        opts = { :name => name.to_s,
+                 :strategy_class => 'org.apache.cassandra.locator.LocalStrategy',
+                 :replication_factor => 1,
+                 :cf_defs => [] }.merge(options)
+
+        ks = Cassandra::Keyspace.new.with_fields(opts)
         @cassandra.add_keyspace ks
       end
 
@@ -45,4 +45,15 @@ module ActiveColumn
 
   end
 
+end
+
+class Cassandra
+  class Keyspace
+    def with_fields(options)
+      struct_fields.collect { |f| f[1][:name] }.each do |f|
+        send("#{f}=", options[f.to_sym])
+      end
+      self
+    end
+  end
 end
