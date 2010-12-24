@@ -4,6 +4,11 @@ module ActiveColumn
 
     class ColumnFamily
 
+      COMPARATOR_TYPES = { :time      => 'TimeUUIDType',
+                           :timestamp => 'TimeUUIDType',
+                           :long      => 'LongType',
+                           :string    => 'BytesType' }
+
       def initialize
         @cassandra = ActiveColumn.connection
       end
@@ -29,16 +34,15 @@ module ActiveColumn
         @cassandra.truncate!(name.to_s)
       end
 
-    end
+      private
 
-    private
-
-    COMPARATOR_TYPES = { :time => 'TimeUUIDType',
-                         :timestamp => 'TimeUUIDType',
-                         :long => 'LongType',
-                         :string => 'BytesType' }
-
-    def post_process_options(options)
+      def post_process_options(options)
+        type = options[:comparator_type]
+        if type && COMPARATOR_TYPES.has_key?(type)
+          options[:comparator_type] = COMPARATOR_TYPES[type]
+        end
+        options
+      end
 
     end
 
