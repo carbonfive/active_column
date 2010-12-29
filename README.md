@@ -1,5 +1,5 @@
 **IMPORTANT**: If you are reading this on the main ActiveColumn page on github, please go to
-[the actual README page](./blob/master/README.md) so that links bring you to the right place.
+[the actual README page](./active_column/blob/master/README.md) so that links bring you to the right place.
 
 # ActiveColumn
 
