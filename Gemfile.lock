@@ -43,6 +43,7 @@ GEM
       activesupport (= 3.0.3)
     activesupport (3.0.3)
     arel (2.0.6)
+    bluecloth (2.0.9)
     builder (2.1.2)
     cassandra (0.9.0)
       json
@@ -123,6 +124,7 @@ GEM
       ruby_parser (~> 2.0.4)
       sexp_processor (~> 3.0)
       sourcify (>= 0.3.0)
+    yard (0.6.4)
 
 PLATFORMS
   ruby
@@ -130,8 +132,10 @@ PLATFORMS
 DEPENDENCIES
   active_column!
   activesupport
+  bluecloth
   cassandra (>= 0.9)
   rails (>= 3.0)
   rake
   rspec-rails
   wrong
+  yard
