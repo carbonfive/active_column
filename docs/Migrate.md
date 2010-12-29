@@ -51,7 +51,7 @@ Note that the date stamp on the file will be different depending on when you cre
 will look like this:
 
 <pre>
-class CreateUsersColumnFamily < ActiveColumn::Migration
+class CreateUsersColumnFamily &lt; ActiveColumn::Migration
 
   def self.up
 
@@ -68,7 +68,7 @@ end
 this:
 
 <pre>
-class CreateUsersColumnFamily < ActiveColumn::Migration
+class CreateUsersColumnFamily &lt; ActiveColumn::Migration
 
   def self.up
     create_column_family :users
