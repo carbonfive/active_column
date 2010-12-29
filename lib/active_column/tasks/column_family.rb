@@ -4,6 +4,11 @@ module ActiveColumn
 
     class ColumnFamily
 
+      COMPARATOR_TYPES = { :time      => 'TimeUUIDType',
+                           :timestamp => 'TimeUUIDType',
+                           :long      => 'LongType',
+                           :string    => 'BytesType' }
+
       def initialize
         @cassandra = ActiveColumn.connection
       end
@@ -13,10 +18,11 @@ module ActiveColumn
       end
 
       def create(name, options = {})
-        cf = Cassandra::ColumnFamily.new
-        cf.name = name.to_s
-        cf.keyspace = options[:keyspace] || @cassandra.keyspace
-        cf.comparator_type = options[:comparator_type] || 'TimeUUIDType'
+        opts = { :name => name.to_s,
+                 :keyspace => @cassandra.keyspace,
+                 :comparator_type => 'TimeUUIDType' }.merge(options)
+
+        cf = Cassandra::ColumnFamily.new.with_fields(opts)
         @cassandra.add_column_family(cf)
       end
 
@@ -28,10 +34,31 @@ module ActiveColumn
         @cassandra.truncate!(name.to_s)
       end
 
+      private
+
+      def post_process_options(options)
+        type = options[:comparator_type]
+        if type && COMPARATOR_TYPES.has_key?(type)
+          options[:comparator_type] = COMPARATOR_TYPES[type]
+        end
+        options
+      end
+
     end
 
   end
 
+end
+
+class Cassandra
+  class ColumnFamily
+    def with_fields(options)
+      struct_fields.collect { |f| f[1][:name] }.each do |f|
+        send("#{f}=", options[f.to_sym])
+      end
+      self
+    end
+  end
 end
 
 
