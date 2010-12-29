@@ -8,13 +8,13 @@ ActiveColumn is a framework for working with data in Cassandra.  It currently in
 - Database migrations
 - "Time line" model data management
 
-Data migrations are very similar to those in ActiveRecord, and are documented in [Migration](./docs/Migration.md).
+Data migrations are very similar to those in ActiveRecord, and are documented in [Migrate](./docs/Migrate.md).
 
 Time line data management is loosely based on concepts in ActiveRecord, but is adapted to saving data in which rows in
 Cassandra grow indefinitely over time, such as in the oft-used Twitter example for Cassandra.  This usage is documented
 in:
 
-- [CRUD](./docs/CRUD.md) - basic get, save, update, delete
+- [Create](./docs/Create.md) - how to create data
 - [Query](./docs/Query.md) - how to find data
 
 ## Installation
