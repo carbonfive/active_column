@@ -1,3 +1,6 @@
+**IMPORTANT**: If you are reading this on the main ActiveColumn page on github, please go to
+[the actual README page](./blob/master/README.md) so that links bring you to the right place.
+
 # ActiveColumn
 
 ActiveColumn is a framework for working with data in Cassandra.  It currently includes two features:
