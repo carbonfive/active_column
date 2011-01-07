@@ -3,6 +3,7 @@ require 'active_support'
 require 'active_support/core_ext/string'
 require 'active_support/core_ext/class/attribute_accessors'
 require 'benchmark'
+require 'yaml'
 
 module ActiveColumn
 
