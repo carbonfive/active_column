@@ -45,8 +45,12 @@ module ActiveColumn
         @cassandra.schema
       end
 
-      def schema_load(schema)
+      def schema_load(keyspace, schema)
+        raise "Keyspace #{keyspace} already exists" if exists?(keyspace)
 
+        schema.name = keyspace.to_s
+        schema.cf_defs.each { |cf| cf.keyspace = keyspace.to_s }
+        @cassandra.add_keyspace schema
       end
 
     end
