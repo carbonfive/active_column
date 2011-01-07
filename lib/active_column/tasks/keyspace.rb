@@ -41,6 +41,14 @@ module ActiveColumn
         @cassandra.clear_keyspace!
       end
 
+      def schema_dump
+        @cassandra.schema
+      end
+
+      def schema_load(schema)
+
+      end
+
     end
 
   end

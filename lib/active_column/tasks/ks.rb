@@ -61,6 +61,22 @@ namespace :ks do
     ActiveColumn::Migrator.forward ActiveColumn::Migrator.migrations_path, step
   end
 
+  namespace :schema do
+    desc 'Create ks/schema.json file that can be portably used against any Cassandra instance supported by ActiveColumn'
+    task :dump do
+      set_keyspace
+      ks = ActiveColumn::Tasks::Keyspace.new
+      File.open 'ks/schema.json', 'w' do |file|
+        file.puts ks.schema_dump.to_json
+      end
+    end
+
+    desc 'Load ks/schema.json file into Cassandra'
+    task :load do
+
+    end
+  end
+
   private
 
   def load_config
