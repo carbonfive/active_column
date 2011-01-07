@@ -6,6 +6,8 @@ require 'wrong/adapters/rspec'
 
 Wrong.config.alias_assert :expect
 
+ActiveColumn::Migration.verbose = false
+
 Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
 $cassandra = ActiveColumn.connection = Cassandra.new('active_column', '127.0.0.1:9160')

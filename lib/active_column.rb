@@ -1,6 +1,8 @@
 require 'cassandra/0.7'
 require 'active_support'
 require 'active_support/core_ext/string'
+require 'active_support/core_ext/class/attribute_accessors'
+require 'benchmark'
 
 module ActiveColumn
 
