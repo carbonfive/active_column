@@ -1,4 +1,6 @@
 require 'rake'
+require 'active_column/tasks/keyspace'
+require 'active_column/tasks/column_family'
 
 namespace :ks do
 
@@ -63,29 +65,50 @@ namespace :ks do
 
   namespace :schema do
     desc 'Create ks/schema.json file that can be portably used against any Cassandra instance supported by ActiveColumn'
-    task :dump do
-      set_keyspace
-      ks = ActiveColumn::Tasks::Keyspace.new
-      File.open 'ks/schema.json', 'w' do |file|
-        file.puts ks.schema_dump.to_json
-      end
+    task :dump => :environment do
+      schema_dump
     end
 
     desc 'Load ks/schema.json file into Cassandra'
-    task :load do
+    task :load => :environment do
+      schema_load
+    end
+  end
 
+  namespace :test do
+    desc 'Load the development schema in to the test keyspace'
+    task :prepare => :environment do
+      schema_dump :development
+      schema_load :test
     end
   end
 
   private
 
+  def schema_dump(env = Rails.env)
+    ks = set_keyspace env
+    File.open "#{Rails.root}/ks/schema.json", 'w' do |file|
+      file.puts ks.schema_dump.to_json
+    end
+  end
+
+  def schema_load(env = Rails.env)
+    ks = set_keyspace env
+    File.open "#{Rails.root}/ks/schema.json", 'r' do |file|
+      hash = JSON.parse(file.read(nil))
+      ks.schema_load ActiveColumn::Tasks::Keyspace.parse(hash)
+    end
+  end
+
   def load_config
     YAML.load_file(Rails.root.join("config", "cassandra.yml"))
   end
 
-  def set_keyspace
-    config = load_config[Rails.env || 'development']
-    ActiveColumn::Tasks::Keyspace.new.set config['keyspace']
+  def set_keyspace(env = Rails.env)
+    config = load_config[env.to_s || 'development']
+    ks = ActiveColumn::Tasks::Keyspace.new
+    ks.set config['keyspace']
+    ks
   end
 
 end

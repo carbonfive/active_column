@@ -4,6 +4,15 @@ module ActiveColumn
 
     class Keyspace
 
+      def self.parse(hash)
+        ks = Cassandra::Keyspace.new.with_fields hash
+        ks.cf_defs = []
+        hash['cf_defs'].each do |cf|
+          ks.cf_defs << Cassandra::ColumnFamily.new.with_fields(cf)
+        end
+        ks
+      end
+
       def initialize
         c = ActiveColumn.connection
         @cassandra = Cassandra.new('system', c.servers, c.thrift_client_options)
@@ -46,7 +55,15 @@ module ActiveColumn
       end
 
       def schema_load(schema)
+        @cassandra.schema.cf_defs.each do |cf|
+          @cassandra.drop_column_family cf.name
+        end
 
+        keyspace = get
+        schema.cf_defs.each do |cf|
+          cf.keyspace = keyspace
+          @cassandra.add_column_family cf
+        end
       end
 
     end
@@ -59,7 +76,7 @@ class Cassandra
   class Keyspace
     def with_fields(options)
       struct_fields.collect { |f| f[1][:name] }.each do |f|
-        send("#{f}=", options[f.to_sym])
+        send("#{f}=", options[f.to_sym] || options[f.to_s])
       end
       self
     end

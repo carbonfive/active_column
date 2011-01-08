@@ -37,36 +37,87 @@ describe ActiveColumn::Tasks::Keyspace do
     end
   end
 
+  describe '.parse' do
+    context 'given a keyspace schema as a hash' do
+      before do
+        @hash = { 'name' => 'ks1',
+                  'cf_defs' => [ { 'name' => 'cf1', 'comment' => 'foo' },
+                                 { 'name' => 'cf2', 'comment' => 'bar' } ] }
+        @schema = ActiveColumn::Tasks::Keyspace.parse @hash
+        @cfdefs = @schema.cf_defs.sort { |a,b| a.name <=> b.name }
+      end
+
+      it 'returns a keyspace schema' do
+        @schema.should be_a(Cassandra::Keyspace)
+        @schema.name.should == 'ks1'
+      end
+
+      it 'returns all column families' do
+        @cfdefs.collect(&:name).should == [ 'cf1', 'cf2' ]
+        @cfdefs.collect(&:comment).should == [ 'foo', 'bar' ]
+      end
+    end
+  end
+
   describe '#schema_dump' do
     context 'given a keyspace' do
       before do
-        @ks.create :ks_schema_test1 unless @ks.exists?(:ks_schema_test1)
-        @ks.set :ks_schema_test1
-        @cf.create :cf1, :keyspace => :ks_schema_test1.to_s, :comment => 'foo'
-        @cf.create :cf2, :keyspace => :ks_schema_test1.to_s, :comment => 'bar'
+        @ks.drop :ks_schema_dump_test if @ks.exists?(:ks_schema_dump_test)
+        @ks.create :ks_schema_dump_test
+        @ks.set :ks_schema_dump_test
+        @cf.create :cf1, :keyspace => :ks_schema_dump_test.to_s, :comment => 'foo'
+        @cf.create :cf2, :keyspace => :ks_schema_dump_test.to_s, :comment => 'bar'
         @schema = @ks.schema_dump
-        @cfdefs = @schema.cf_defs
-        @cfdefs.sort! { |a,b| a.name <=> b.name }
+        @cfdefs = @schema.cf_defs.sort { |a,b| a.name <=> b.name }
       end
 
       it 'dumps the keyspace schema' do
         @schema.should be
-        @schema.name.should == 'ks_schema_test1'
+        @schema.name.should == 'ks_schema_dump_test'
       end
 
-      it 'the dump has all column families' do
-        @cfdefs.should have(2).cfdefs
-      end
-
-      it 'the column families have correct attributes' do
-        @cfdefs[0].name.should == 'cf1'
-        @cfdefs[0].comment.should == 'foo'
-        @cfdefs[1].name.should == 'cf2'
-        @cfdefs[1].comment.should == 'bar'
+      it 'dumps all column families' do
+        @cfdefs.collect(&:name).should == [ 'cf1', 'cf2' ]
+        @cfdefs.collect(&:comment).should == [ 'foo', 'bar' ]
       end
 
       after do
-        @ks.drop :ks_schema_test1
+        @ks.drop :ks_schema_dump_test
+      end
+    end
+  end
+
+  describe '#keyspace_load' do
+    context 'given a keyspace schema' do
+      before do
+        @ks.drop :ks_schema_load_test if @ks.exists?(:ks_schema_load_test)
+        @ks.create :ks_schema_load_test
+        @ks.set :ks_schema_load_test
+        @cf.create :cf1, :keyspace => :ks_schema_load_test.to_s, :comment => 'foo'
+        @cf.create :cf2, :keyspace => :ks_schema_load_test.to_s, :comment => 'bar'
+        schema = @ks.schema_dump
+
+        @ks.drop :ks_schema_load_test2 if @ks.exists?(:ks_schema_load_test2)
+        @ks.create :ks_schema_load_test2
+        @ks.set :ks_schema_load_test2
+        @ks.schema_load schema
+        @schema2 = @ks.schema_dump
+        @cfdefs2 = @schema2.cf_defs.sort { |a,b| a.name <=> b.name }
+      end
+
+      it 'loads the keyspace' do
+        @schema2.should be
+        @schema2.name.should == 'ks_schema_load_test2'
+      end
+
+      it 'loads all column families' do
+        @cfdefs2.collect(&:name).should == [ 'cf1', 'cf2' ]
+        @cfdefs2.collect(&:comment).should == [ 'foo', 'bar' ]
+      end
+
+      after do
+        @ks.drop :ks_schema_load_test
+        @ks.drop :ks_schema_load_test2
       end
     end
   end
