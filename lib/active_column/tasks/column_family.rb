@@ -54,7 +54,7 @@ class Cassandra
   class ColumnFamily
     def with_fields(options)
       struct_fields.collect { |f| f[1][:name] }.each do |f|
-        send("#{f}=", options[f.to_sym])
+        send("#{f}=", options[f.to_sym] || options[f.to_s])
       end
       self
     end
