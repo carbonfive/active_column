@@ -29,4 +29,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'wrong'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'bluecloth'
+  s.add_development_dependency 'cucumber'
+  s.add_development_dependency 'aruba'
 end
