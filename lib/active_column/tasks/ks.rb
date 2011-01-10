@@ -83,6 +83,13 @@ namespace :ks do
     end
   end
 
+  desc 'Retrieves the current schema version number'
+  task :version => :environment do
+    set_keyspace
+    version = ActiveColumn::Migrator.current_version
+    puts "Current version: #{version}"
+  end
+
   private
 
   def schema_dump(env = Rails.env)
