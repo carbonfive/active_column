@@ -49,3 +49,11 @@ Then /^the keyspace is dropped for each environment$/ do
   $cassandra.keyspaces.should_not include('sample_app_test')
   all_stdout.should match /dropped keyspaces: sample_app_development, sample_app_test/i
 end
+
+Then /^a new migration is created$/ do
+  cd 'ks/migrate'
+  in_current_dir do
+    migration = Dir['*'][0]
+    migration.should match(/create_posts_by_users/i)
+  end
+end
