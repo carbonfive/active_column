@@ -13,6 +13,7 @@ module ActiveColumn
   autoload :Version,        'active_column/version'
 
   require                   'active_column/errors'
+  require                   'active_column/migrator'
   require                   'active_column/migration'
 
   module Tasks

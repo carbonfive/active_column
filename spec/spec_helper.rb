@@ -12,11 +12,11 @@ Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
 $cassandra = ActiveColumn.connection = Cassandra.new('active_column', '127.0.0.1:9160')
 
-ks_tasks = ActiveColumn::Tasks::Keyspace.new
+ks_tasks = ActiveColumn.keyspace_tasks
 unless ks_tasks.exists?('active_column')
   ks_tasks.create('active_column')
 
-  cf_tasks = ActiveColumn::Tasks::ColumnFamily.new
+  cf_tasks = ActiveColumn.column_family_tasks
   [:tweets, :tweet_dms].each do |cf|
     cf_tasks.create(cf, :keyspace => 'active_column')
   end
@@ -26,10 +26,7 @@ ks_tasks.set 'active_column'
 ks_tasks.clear
 
 RSpec.configure do |config|
-
-  config.before do
-  end
-  
+  config.mock_with :mocha
 end
 
 class Counter
