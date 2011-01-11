@@ -4,88 +4,91 @@ require 'active_column/tasks/column_family'
 
 namespace :ks do
 
-  desc 'Create the keyspace in config/cassandra.yml for the current environment'
-  task :create => :environment do
-    config = load_config[Rails.env || 'development']
-    ks = config['keyspace']
-    ActiveColumn::Tasks::Keyspace.new.create ks, config
-    puts "Created keyspace: #{ks}"
+  task :configure => :environment do
+    @configs = YAML.load_file(Rails.root.join("config", "cassandra.yml"))
+    @config = @configs[Rails.env || 'development']
   end
 
-  desc 'Create keyspaces in config/cassandra.yml for all environments'
-  task 'create:all' => :environment do
-    config = load_config
-    kss = []
-    config.keys.each do |env|
-      kss << config[env]['keyspace']
-      ActiveColumn::Tasks::Keyspace.new.create kss.last, config
+  task :set_keyspace => :configure do
+    set_keyspace
+  end
+
+  desc 'Create the keyspace in config/cassandra.yml for the current environment'
+  task :create => :configure do
+    ActiveColumn::Tasks::Keyspace.new.create @config['keyspace'], @config
+    puts "Created keyspace: #{@config['keyspace']}"
+  end
+
+  namespace :create do
+    desc 'Create keyspaces in config/cassandra.yml for all environments'
+    task :all => :configure do
+      created = []
+      @configs.values.each do |config|
+        ActiveColumn::Tasks::Keyspace.new.create config['keyspace'], config
+        created << config['keyspace']
+      end
+      puts "Created keyspaces: #{created.join(', ')}"
     end
-    puts "Created keyspaces: #{kss.join(', ')}"
   end
 
   desc 'Drop keyspace in config/cassandra.yml for the current environment'
-  task :drop => :environment do
-    config = load_config[Rails.env || 'development']
-    ks = config['keyspace']
-    ActiveColumn::Tasks::Keyspace.new.drop ks
-    puts "Dropped keyspace: #{ks}"
+  task :drop => :configure do
+    ActiveColumn::Tasks::Keyspace.new.drop @config['keyspace']
+    puts "Dropped keyspace: #{@config['keyspace']}"
   end
 
-  desc 'Drop keyspaces in config/cassandra.yml for all environments'
-  task 'drop:all' => :environment do
-    config = load_config
-    kss = []
-    config.keys.each do |env|
-      kss << config[env]['keyspace']
-      ActiveColumn::Tasks::Keyspace.new.drop kss.last
+  namespace :drop do
+    desc 'Drop keyspaces in config/cassandra.yml for all environments'
+    task :all => :configure do
+      dropped = []
+      @configs.values.each do |config|
+        ActiveColumn::Tasks::Keyspace.new.drop config['keyspace']
+        dropped << config['keyspace']
+      end
+      puts "Dropped keyspaces: #{dropped.join(', ')}"
     end
-    puts "Dropped keyspaces: #{kss.join(', ')}"
   end
 
   desc 'Migrate the keyspace (options: VERSION=x)'
-  task :migrate => :environment do
-    set_keyspace
+  task :migrate => :set_keyspace do
     version = ( ENV['VERSION'] ? ENV['VERSION'].to_i : nil )
     ActiveColumn::Migrator.migrate ActiveColumn::Migrator.migrations_path, version
   end
 
   desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n)'
-  task :rollback => :environment do
-    set_keyspace
+  task :rollback => :set_keyspace do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     ActiveColumn::Migrator.rollback ActiveColumn::Migrator.migrations_path, step
   end
 
   desc 'Pushes the schema to the next version (specify steps w/ STEP=n)'
-  task :forward => :environment do
-    set_keyspace
+  task :forward => :set_keyspace do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     ActiveColumn::Migrator.forward ActiveColumn::Migrator.migrations_path, step
   end
 
   namespace :schema do
     desc 'Create ks/schema.json file that can be portably used against any Cassandra instance supported by ActiveColumn'
-    task :dump => :environment do
+    task :dump => :configure do
       schema_dump
     end
 
     desc 'Load ks/schema.json file into Cassandra'
-    task :load => :environment do
+    task :load => :configure do
       schema_load
     end
   end
 
   namespace :test do
     desc 'Load the development schema in to the test keyspace'
-    task :prepare => :environment do
+    task :prepare => :configure do
       schema_dump :development
       schema_load :test
     end
   end
 
   desc 'Retrieves the current schema version number'
-  task :version => :environment do
-    set_keyspace
+  task :version => :set_keyspace do
     version = ActiveColumn::Migrator.current_version
     puts "Current version: #{version}"
   end
@@ -107,12 +110,8 @@ namespace :ks do
     end
   end
 
-  def load_config
-    YAML.load_file(Rails.root.join("config", "cassandra.yml"))
-  end
-
   def set_keyspace(env = Rails.env)
-    config = load_config[env.to_s || 'development']
+    config = @configs[env.to_s || 'development']
     ks = ActiveColumn::Tasks::Keyspace.new
     ks.set config['keyspace']
     ks
