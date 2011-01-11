@@ -8,7 +8,7 @@ require 'yaml'
 module ActiveColumn
 
   autoload :Base,           'active_column/base'
-  autoload :Connection,     'active_column/connection'
+  autoload :Configuration,  'active_column/configuration'
   autoload :KeyConfig,      'active_column/key_config'
   autoload :Version,        'active_column/version'
 
@@ -26,6 +26,6 @@ module ActiveColumn
     require                 'active_column/generators/migration_generator'
   end
 
-  extend Connection
-  
+  extend Configuration
+
 end
