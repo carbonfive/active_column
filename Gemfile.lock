@@ -63,6 +63,8 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
+    mocha (0.9.10)
+      rake
     polyglot (0.3.1)
     predicated (0.2.2)
     rack (1.2.1)
@@ -134,6 +136,7 @@ DEPENDENCIES
   activesupport
   bluecloth
   cassandra (>= 0.9)
+  mocha
   rails (>= 3.0)
   rake
   rspec-rails

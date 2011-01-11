@@ -22,6 +22,8 @@ module ActiveColumn
                  :keyspace => @cassandra.keyspace,
                  :comparator_type => 'TimeUUIDType' }.merge(options)
 
+        opts = post_process_options(opts)
+
         cf = Cassandra::ColumnFamily.new.with_fields(opts)
         @cassandra.add_column_family(cf)
       end

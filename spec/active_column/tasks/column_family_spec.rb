@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def translated_comparator(given)
-  cf = ActiveColumn::Tasks::ColumnFamily.new
+  cf = ActiveColumn.column_family_tasks
   cf.send(:post_process_options, { :comparator_type => given })[:comparator_type]
 end
 

@@ -3,8 +3,8 @@ require 'spec_helper'
 describe ActiveColumn::Tasks::Keyspace do
 
   before do
-    @ks = ActiveColumn::Tasks::Keyspace.new
-    @cf = ActiveColumn::Tasks::ColumnFamily.new
+    @ks = ActiveColumn.keyspace_tasks
+    @cf = ActiveColumn.column_family_tasks
   end
 
   describe "#create" do
@@ -87,7 +87,7 @@ describe ActiveColumn::Tasks::Keyspace do
     end
   end
 
-  describe '#keyspace_load' do
+  describe '#schema_load' do
     context 'given a keyspace schema' do
       before do
         @ks.drop :ks_schema_load_test if @ks.exists?(:ks_schema_load_test)
