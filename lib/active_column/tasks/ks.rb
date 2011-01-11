@@ -53,18 +53,21 @@ namespace :ks do
   task :migrate => :set_keyspace do
     version = ( ENV['VERSION'] ? ENV['VERSION'].to_i : nil )
     ActiveColumn::Migrator.migrate ActiveColumn::Migrator.migrations_path, version
+    schema_dump
   end
 
   desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n)'
   task :rollback => :set_keyspace do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     ActiveColumn::Migrator.rollback ActiveColumn::Migrator.migrations_path, step
+    schema_dump
   end
 
   desc 'Pushes the schema to the next version (specify steps w/ STEP=n)'
   task :forward => :set_keyspace do
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     ActiveColumn::Migrator.forward ActiveColumn::Migrator.migrations_path, step
+    schema_dump
   end
 
   namespace :schema do
