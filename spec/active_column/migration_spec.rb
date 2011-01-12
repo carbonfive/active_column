@@ -3,41 +3,32 @@ require 'mocha'
 
 describe ActiveColumn::Migration do
   describe '.create_column_family' do
-    context 'given an options hash' do
-      before do
-        ActiveColumn::Tasks::ColumnFamily.
-                stubs(:create).with('foo1', :comment => '1')
-      end
-
-      it 'receives an options hash' do
-        ActiveColumn::Migration.create_column_family 'foo1', :comment => '1'
-      end
-    end
 
     context 'given a block' do
       before do
-        ActiveColumn::Tasks::ColumnFamily.
-                stubs(:create).with('foo2', :comment => '1')
+        ActiveColumn.connection.expects(:add_column_family).with() do |cf|
+          cf.name == 'foo' && cf.comment = 'some comment'
+        end
       end
 
-      it 'receives the options has a hash' do
-        ActiveColumn::Migration.create_column_family 'foo2' do |cf|
-          cf.comment = '1'
+      it 'sends the settings to cassandra' do
+        ActiveColumn::Migration.create_column_family 'foo' do |cf|
+          cf.comment = 'some comment'
         end
       end
     end
 
-    context 'given an options hash and a block' do
+    context 'given no block' do
       before do
-        ActiveColumn::Tasks::ColumnFamily.
-                stubs(:create).with('foo3', :comment => '2')
-      end
-
-      it 'receives the options has a hash with the block overriding the hash' do
-        ActiveColumn::Migration.create_column_family('foo3', :comment => '1') do |cf|
-          cf.comment = '2'
+        ActiveColumn.connection.expects(:add_column_family).with() do |cf|
+          cf.name == 'foo' && cf.comment.nil?
         end
       end
+
+      it 'sends the default settings to cassandra' do
+        ActiveColumn::Migration.create_column_family 'foo'
+      end
     end
+
   end
 end
