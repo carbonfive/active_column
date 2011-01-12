@@ -23,7 +23,7 @@ the equivalent of a database in MySQL (or other relational dbs).  To see the ava
 rake -T ks
 </pre>
 
-3. Create your databases with the **ks:create:all** rake task:
+3. Create your keyspaces with the **ks:create:all** rake task:
 
 <pre>
 rake ks:create:all
@@ -71,7 +71,10 @@ this:
 class CreateUsersColumnFamily &lt; ActiveColumn::Migration
 
   def self.up
-    create_column_family :users
+    create_column_family :users do |cf|
+      cf.comment = 'Users column family'
+      cf.comparator_type = :string
+    end
   end
 
   def self.down
@@ -88,13 +91,11 @@ rake ks:migrate
 </pre>
 
 This will create the column family for your development environment.  But you also need it in your test environment.
-For now, you have to do this like the following.  However, soon this will be updated to work more like ActiveRecord
-migrations.
 
-7. Run the migrate rake task (for test):
+7. Prepare the test environment keyspace:
 
 <pre>
-RAILS_ENV=test rake ks:migrate
+rake ks:test:prepare
 </pre>
 
 And BAM!  You have your development and test keyspaces set up correctly.
