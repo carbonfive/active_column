@@ -99,3 +99,8 @@ rake ks:test:prepare
 </pre>
 
 And BAM!  You have your development and test keyspaces set up correctly.
+
+### Inside your migrations
+
+ActiveColumn::Migration, which all migrations extend by default, offers some useful functions.  They are documented
+via rdoc in the code itself.
