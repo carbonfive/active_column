@@ -20,7 +20,7 @@ module ActiveColumn
       def create(name, &block)
         cf = Cassandra::ColumnFamily.new
         cf.name = name.to_s
-        cf.keyspace = @keyspace.to_sr
+        cf.keyspace = @keyspace.to_s
         cf.comparator_type = 'TimeUUIDType'
 
         block.call cf if block
@@ -31,6 +31,10 @@ module ActiveColumn
 
       def drop(name)
         connection.drop_column_family(name.to_s)
+      end
+
+      def rename(old_name, new_name)
+        connection.rename_column_family(old_name.to_s, new_name.to_s)
       end
 
       def clear(name)

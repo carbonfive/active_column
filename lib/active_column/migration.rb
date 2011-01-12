@@ -5,6 +5,7 @@ module ActiveColumn
     @@verbose = true
     cattr_accessor :verbose
 
+    # Returns the raw connection to Cassandra
     def self.connection
       ActiveColumn.connection
     end
@@ -28,12 +29,31 @@ module ActiveColumn
       result
     end
 
+    # Creates a new column family with the given name.  Column family configurations can be set within
+    # a block like this:
+    #
+    #  create_column_family(:users) do |cf|
+    #    cf.comment = 'Users column family'
+    #    cf.comparator_type = 'TimeUUIDType'
+    #  end
+    #
+    # A complete list of available configuration settings is here:
+    #
+    # http://github.com/fauna/cassandra/blob/master/vendor/0.7/gen-rb/cassandra_types.rb
+    #
+    # Scroll down to the CfDef definition.
     def self.create_column_family(name, &block)
       ActiveColumn.column_family_tasks.create(name, &block)
     end
 
+    # Drops the given column family
     def self.drop_column_family(name)
       ActiveColumn.column_family_tasks.drop(name)
+    end
+
+    # Renames the column family from the old name to the new name
+    def self.rename_column_family(old_name, new_name)
+      ActiveColumn.column_family_tasks.rename(old_name, new_name)
     end
 
     def self.write(text="")
