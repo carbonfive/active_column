@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 def translated_comparator(given)
-  cf = ActiveColumn.column_family_tasks
-  cf.send(:post_process_options, { :comparator_type => given })[:comparator_type]
+  cf_tasks = ActiveColumn.column_family_tasks
+  cf = Cassandra::ColumnFamily.new
+  cf.comparator_type = given
+  cf_tasks.send(:post_process_column_family, cf).comparator_type
 end
 
 describe ActiveColumn::Tasks::ColumnFamily do

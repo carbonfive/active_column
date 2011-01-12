@@ -6,7 +6,7 @@ module ActiveColumn
     cattr_accessor :verbose
 
     def self.connection
-      $cassandra
+      ActiveColumn.connection
     end
 
     def self.migrate(direction)
@@ -28,18 +28,12 @@ module ActiveColumn
       result
     end
 
-    def self.create_column_family(name, options = {})
-      if block_given?
-        cf_opts = ColumnFamilyOptions.new
-        yield cf_opts
-        options.merge! cf_opts.options
-      end
-
-      ActiveColumn::Tasks::ColumnFamily.create(name, options)
+    def self.create_column_family(name, &block)
+      ActiveColumn.column_family_tasks.create(name, &block)
     end
 
     def self.drop_column_family(name)
-      ActiveColumn::Tasks::ColumnFamily.drop(name)
+      ActiveColumn.column_family_tasks.drop(name)
     end
 
     def self.write(text="")
@@ -95,23 +89,6 @@ module ActiveColumn
       name.constantize
     end
 
-  end
-
-  private
-
-  class ColumnFamilyOptions
-    Cassandra::ColumnFamily::FIELDS.values.each do |f|
-      name = f[:name]
-      define_method("#{name}=") do|val|
-        @options[name.to_sym] = val
-      end
-    end
-
-    attr_reader :options
-
-    def initialize
-      @options = {}
-    end
   end
 
 end
