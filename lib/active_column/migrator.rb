@@ -98,11 +98,13 @@ module ActiveColumn
     public
 
     def initialize(direction, migrations_path, target_version = nil)
-      cf = ActiveColumn.column_family_tasks
+      cf_tasks = ActiveColumn.column_family_tasks
       sm_cf = self.class.schema_migrations_column_family
 
-      unless cf.exists?(sm_cf)
-        cf.create(sm_cf, :comparator_type => 'LongType')
+      unless cf_tasks.exists?(sm_cf)
+        cf_tasks.create(sm_cf) do |cf|
+          cf.comparator_type = 'LongType'
+        end
       end
 
       @direction, @migrations_path, @target_version = direction, migrations_path, target_version

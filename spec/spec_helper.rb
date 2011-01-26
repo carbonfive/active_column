@@ -12,17 +12,18 @@ Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
 $cassandra = ActiveColumn.connection = Cassandra.new('active_column', '127.0.0.1:9160')
 
+keyspace = 'active_column'
 ks_tasks = ActiveColumn.keyspace_tasks
-unless ks_tasks.exists?('active_column')
-  ks_tasks.create('active_column')
+unless ks_tasks.exists?(keyspace)
+  ks_tasks.create keyspace
 
-  cf_tasks = ActiveColumn.column_family_tasks
+  cf_tasks = ActiveColumn.column_family_tasks keyspace
   [:tweets, :tweet_dms].each do |cf|
-    cf_tasks.create(cf, :keyspace => 'active_column')
+    cf_tasks.create cf
   end
 end
 
-ks_tasks.set 'active_column'
+ks_tasks.set keyspace
 ks_tasks.clear
 
 RSpec.configure do |config|

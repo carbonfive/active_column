@@ -56,7 +56,7 @@ GEM
     file-tail (1.0.5)
       spruz (>= 0.1.0)
     i18n (0.5.0)
-    json (1.4.6)
+    json (1.5.0)
     mail (2.2.12)
       activesupport (>= 2.3.6)
       i18n (>= 0.4.0)
@@ -105,7 +105,7 @@ GEM
     ruby_parser (2.0.5)
       sexp_processor (~> 3.0)
     sexp_processor (3.0.5)
-    simple_uuid (0.1.1)
+    simple_uuid (0.1.2)
     sourcify (0.4.0)
       ruby2ruby (>= 1.2.5)
       sexp_processor (>= 3.0.5)
@@ -133,12 +133,9 @@ PLATFORMS
 
 DEPENDENCIES
   active_column!
-  activesupport
   bluecloth
-  cassandra (>= 0.9)
   mocha
   rails (>= 3.0)
-  rake
   rspec-rails
   wrong
   yard
