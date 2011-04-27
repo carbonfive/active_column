@@ -33,8 +33,12 @@ bundle install
 
 ### Configuration
 
-ActiveColumn requires Cassandra 0.7 or above, as we as the [cassandra gem](https://github.com/fauna/cassandra),
-version 0.9 or above.
+ActiveColumn requires Cassandra 0.7 or above, as well as the [cassandra gem](https://github.com/fauna/cassandra),
+version 0.9 or above.  You must also be sure to use the Cassandra 0.7 support in the gem, which can be done by
+adding Cassandra to your Gemfile like this:
+<pre>
+gem 'cassandra', '>= 0.9', :require => 'cassandra/0.7'
+</pre>
 
 Data migrations in ActiveColumn are used within a Rails project, and are driven off of a configuration file,
 config/cassandra.yml.  It should look something like this:
