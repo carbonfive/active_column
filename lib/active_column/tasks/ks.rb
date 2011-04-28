@@ -101,7 +101,9 @@ namespace :ks do
   def schema_dump(env = Rails.env)
     ks = set_keyspace env
     File.open "#{Rails.root}/ks/schema.json", 'w' do |file|
-      file.puts ks.schema_dump.to_json
+      basic_json = ks.schema_dump.to_json
+      formatted_json = JSON.pretty_generate(JSON.parse(basic_json))
+      file.puts formatted_json
     end
   end
 
