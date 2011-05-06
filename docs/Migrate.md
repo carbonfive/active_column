@@ -104,3 +104,15 @@ And BAM!  You have your development and test keyspaces set up correctly.
 
 ActiveColumn::Migration, which all migrations extend by default, offers some useful functions.  They are documented
 via rdoc in the code itself.
+
+### But I'm using Sinatra!
+
+If you are using Rails, you don't need to do anything beyond including the active\_column gem in your Gemfile.
+However, if you are using Sinatra (or some other framework), you can get these rake tasks to work merely by adding
+the following line to your Rakefile:
+<pre>
+require 'active_column'
+</pre>
+
+Please note, however, that the Rails generator is only available if you are using Rails.  If you are not using Rails,
+you will have to create your migrations by hand.
