@@ -61,10 +61,10 @@ describe ActiveColumn::Tasks::Keyspace do
   describe '#schema_dump' do
     context 'given a keyspace' do
       before do
-        cf_tasks = ActiveColumn.column_family_tasks :ks_schema_dump_test
         @ks.drop :ks_schema_dump_test if @ks.exists?(:ks_schema_dump_test)
         @ks.create :ks_schema_dump_test
         @ks.set :ks_schema_dump_test
+        cf_tasks = ActiveColumn::Tasks::ColumnFamily.new :ks_schema_dump_test
         cf_tasks.create(:cf1) { |cf| cf.comment = 'foo' }
         cf_tasks.create(:cf2) { |cf| cf.comment = 'bar' }
         @schema = @ks.schema_dump
@@ -90,10 +90,10 @@ describe ActiveColumn::Tasks::Keyspace do
   describe '#schema_load' do
     context 'given a keyspace schema' do
       before do
-        cf_tasks = ActiveColumn.column_family_tasks :ks_schema_load_test
         @ks.drop :ks_schema_load_test if @ks.exists?(:ks_schema_load_test)
         @ks.create :ks_schema_load_test
         @ks.set :ks_schema_load_test
+        cf_tasks = ActiveColumn::Tasks::ColumnFamily.new :ks_schema_load_test
         cf_tasks.create(:cf1) { |cf| cf.comment = 'foo' }
         cf_tasks.create(:cf2) { |cf| cf.comment = 'bar' }
         schema = @ks.schema_dump

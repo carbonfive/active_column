@@ -3,7 +3,14 @@ module ActiveColumn
   class Migration
 
     @@verbose = true
-    cattr_accessor :verbose
+
+    def self.verbose=(verbose)
+      @@verbose = verbose
+    end
+
+    def self.verbose
+      @@verbose
+    end
 
     # Returns the raw connection to Cassandra
     def self.connection
@@ -96,7 +103,17 @@ module ActiveColumn
 
     attr_accessor :name, :version, :filename
 
-    delegate :migrate, :announce, :write, :to=>:migration
+    def migrate(*args)
+      migration.migrate *args
+    end
+
+    def announce(*args)
+      migration.announce *args
+    end
+
+    def write(*args)
+      migration.write *args
+    end
 
     private
 
@@ -106,7 +123,7 @@ module ActiveColumn
 
     def load_migration
       require(File.expand_path(filename))
-      name.constantize
+      eval(name)
     end
 
   end

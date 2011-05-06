@@ -33,6 +33,8 @@ module ActiveColumn
       end
 
       def drop(name)
+        return puts 'Cannot drop system keyspace' if name == 'system'
+
         @cassandra.drop_keyspace name.to_s
       end
 
