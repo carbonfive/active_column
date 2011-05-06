@@ -8,6 +8,7 @@ module ActiveColumn
   autoload :Configuration,  'active_column/configuration'
   autoload :KeyConfig,      'active_column/key_config'
   autoload :Version,        'active_column/version'
+  autoload :Helpers,        'active_column/helpers'
 
   require                   'active_column/errors'
   require                   'active_column/migrator'

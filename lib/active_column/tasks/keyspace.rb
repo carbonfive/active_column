@@ -3,6 +3,7 @@ module ActiveColumn
   module Tasks
 
     class Keyspace
+      include ActiveColumn::Helpers
 
       def self.parse(hash)
         ks = Cassandra::Keyspace.new.with_fields hash
@@ -23,6 +24,11 @@ module ActiveColumn
       end
 
       def create(name, options = {})
+        if exists? name
+          log "Keyspace '#{name}' already exists - cannot create"
+          return nil
+        end
+
         opts = { :name => name.to_s,
                  :strategy_class => 'org.apache.cassandra.locator.LocalStrategy',
                  :replication_factor => 1,
@@ -30,15 +36,18 @@ module ActiveColumn
 
         ks = Cassandra::Keyspace.new.with_fields(opts)
         @cassandra.add_keyspace ks
+        ks
       end
 
       def drop(name)
-        return puts 'Cannot drop system keyspace' if name == 'system'
-
+        return log 'Cannot drop system keyspace' if name == 'system'
+        return log "Keyspace '#{name}' does not exist - cannot drop" if !exists? name
         @cassandra.drop_keyspace name.to_s
+        true
       end
 
       def set(name)
+        return log "Keyspace '#{name}' does not exist - cannot set" if !exists? name
         @cassandra.keyspace = name.to_s
       end
 
@@ -47,8 +56,7 @@ module ActiveColumn
       end
 
       def clear
-        return puts 'Cannot clear system keyspace' if @cassandra.keyspace == 'system'
-
+        return log 'Cannot clear system keyspace' if @cassandra.keyspace == 'system'
         @cassandra.clear_keyspace!
       end
 

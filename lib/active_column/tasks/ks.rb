@@ -20,37 +20,33 @@ namespace :ks do
 
   desc 'Create the keyspace in config/cassandra.yml for the current environment'
   task :create => :configure do
-    ActiveColumn::Tasks::Keyspace.new.create @config['keyspace'], @config
-    puts "Created keyspace: #{@config['keyspace']}"
+    ks = ActiveColumn::Tasks::Keyspace.new.create @config['keyspace'], @config
+    puts "Created keyspace: #{@config['keyspace']}" if ks
   end
 
   namespace :create do
     desc 'Create keyspaces in config/cassandra.yml for all environments'
     task :all => :configure do
-      created = []
       @configs.values.each do |config|
-        ActiveColumn::Tasks::Keyspace.new.create config['keyspace'], config
-        created << config['keyspace']
+        ks = ActiveColumn::Tasks::Keyspace.new.create config['keyspace'], config
+        puts "Created keyspace: #{config['keyspace']}" if ks
       end
-      puts "Created keyspaces: #{created.join(', ')}"
     end
   end
 
   desc 'Drop keyspace in config/cassandra.yml for the current environment'
   task :drop => :configure do
-    ActiveColumn::Tasks::Keyspace.new.drop @config['keyspace']
-    puts "Dropped keyspace: #{@config['keyspace']}"
+    dropped = ActiveColumn::Tasks::Keyspace.new.drop @config['keyspace']
+    puts "Dropped keyspace: #{@config['keyspace']}" if dropped
   end
 
   namespace :drop do
     desc 'Drop keyspaces in config/cassandra.yml for all environments'
     task :all => :configure do
-      dropped = []
       @configs.values.each do |config|
-        ActiveColumn::Tasks::Keyspace.new.drop config['keyspace']
-        dropped << config['keyspace']
+        dropped = ActiveColumn::Tasks::Keyspace.new.drop config['keyspace']
+        puts "Dropped keyspace: #{config['keyspace']}" if dropped
       end
-      puts "Dropped keyspaces: #{dropped.join(', ')}"
     end
   end
 
@@ -103,10 +99,6 @@ namespace :ks do
 
   private
 
-  def current_env
-    ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
-  end
-
   def current_root
     return Rails.root.to_s if defined? ::Rails
     '.'
@@ -114,11 +106,11 @@ namespace :ks do
 
   def configure
     @configs = YAML.load_file("#{current_root}/config/cassandra.yml")
-    @config = @configs[current_env]
+    @config = @configs[ActiveColumn::Helpers.current_env]
     ActiveColumn.connect @config
   end
 
-  def schema_dump(env = current_env)
+  def schema_dump(env = ActiveColumn::Helpers.current_env)
     ks = set_keyspace env
     File.open "#{current_root}/ks/schema.json", 'w' do |file|
       basic_json = ks.schema_dump.to_json
@@ -127,7 +119,7 @@ namespace :ks do
     end
   end
 
-  def schema_load(env = current_env)
+  def schema_load(env = ActiveColumn::Helpers.current_env)
     ks = set_keyspace env
     File.open "#{current_root}/ks/schema.json", 'r' do |file|
       hash = JSON.parse(file.read(nil))
@@ -135,12 +127,12 @@ namespace :ks do
     end
   end
 
-  def set_keyspace(env = current_env)
+  def set_keyspace(env = ActiveColumn::Helpers.current_env)
     config = @configs[env.to_s || 'development']
     ks = ActiveColumn::Tasks::Keyspace.new
     keyspace = config['keyspace']
     unless ks.exists? keyspace
-      puts "Keyspace '#{keyspace}' does not exist.  Try ks:create."
+      puts "Keyspace '#{keyspace}' does not exist - Try 'rake ks:create'"
       exit 1
     end
     ks.set keyspace
@@ -148,19 +140,3 @@ namespace :ks do
   end
 
 end
-
-private
-
-class Object
-  def to_json(*a)
-    result = {
-      JSON.create_id => self.class.name
-    }
-    instance_variables.inject(result) do |r, name|
-      r[name[1..-1]] = instance_variable_get name
-      r
-    end
-    result.to_json(*a)
-  end
-end
-

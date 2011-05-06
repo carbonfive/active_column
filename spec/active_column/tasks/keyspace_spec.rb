@@ -10,11 +10,20 @@ describe ActiveColumn::Tasks::Keyspace do
     context "given a keyspace" do
       before do
         @ks.drop :ks_create_test if @ks.exists?(:ks_create_test)
-        @ks.create :ks_create_test
+        @keyspace = @ks.create :ks_create_test
+        @no_keyspace = @ks.create :ks_create_test
       end
 
       it "creates the keyspace" do
         @ks.exists?(:ks_create_test).should be
+      end
+
+      it 'returns the keyspace' do
+        @keyspace.should be
+      end
+
+      it 'does not create duplicate keyspaces' do
+        @no_keyspace.should_not be
       end
 
       after do
@@ -32,6 +41,10 @@ describe ActiveColumn::Tasks::Keyspace do
 
       it 'drops the keyspace' do
         @ks.exists?(:ks_drop_test).should_not be
+      end
+
+      it 'gracefully does not drop the keyspace again' do
+        @ks.drop :ks_drop_test
       end
     end
   end
