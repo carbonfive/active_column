@@ -4,9 +4,14 @@ require 'active_column/tasks/column_family'
 
 namespace :ks do
 
-  task :configure => :environment do
-    @configs = YAML.load_file(Rails.root.join("config", "cassandra.yml"))
-    @config = @configs[Rails.env || 'development']
+  if defined? ::Rails
+    task :configure => :environment do
+      configure
+    end
+  else
+    task :configure do
+      configure
+    end
   end
 
   task :set_keyspace => :configure do
@@ -98,29 +103,64 @@ namespace :ks do
 
   private
 
-  def schema_dump(env = Rails.env)
+  def current_env
+    ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
+  end
+
+  def current_root
+    return Rails.root.to_s if defined? ::Rails
+    '.'
+  end
+
+  def configure
+    @configs = YAML.load_file("#{current_root}/config/cassandra.yml")
+    @config = @configs[current_env]
+    ActiveColumn.connect @config
+  end
+
+  def schema_dump(env = current_env)
     ks = set_keyspace env
-    File.open "#{Rails.root}/ks/schema.json", 'w' do |file|
+    File.open "#{current_root}/ks/schema.json", 'w' do |file|
       basic_json = ks.schema_dump.to_json
       formatted_json = JSON.pretty_generate(JSON.parse(basic_json))
       file.puts formatted_json
     end
   end
 
-  def schema_load(env = Rails.env)
+  def schema_load(env = current_env)
     ks = set_keyspace env
-    File.open "#{Rails.root}/ks/schema.json", 'r' do |file|
+    File.open "#{current_root}/ks/schema.json", 'r' do |file|
       hash = JSON.parse(file.read(nil))
       ks.schema_load ActiveColumn::Tasks::Keyspace.parse(hash)
     end
   end
 
-  def set_keyspace(env = Rails.env)
+  def set_keyspace(env = current_env)
     config = @configs[env.to_s || 'development']
     ks = ActiveColumn::Tasks::Keyspace.new
-    ks.set config['keyspace']
+    keyspace = config['keyspace']
+    unless ks.exists? keyspace
+      puts "Keyspace '#{keyspace}' does not exist.  Try ks:create."
+      exit 1
+    end
+    ks.set keyspace
     ks
   end
 
+end
+
+private
+
+class Object
+  def to_json(*a)
+    result = {
+      JSON.create_id => self.class.name
+    }
+    instance_variables.inject(result) do |r, name|
+      r[name[1..-1]] = instance_variable_get name
+      r
+    end
+    result.to_json(*a)
+  end
 end
 

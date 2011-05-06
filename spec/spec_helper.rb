@@ -18,7 +18,7 @@ ks_tasks = ActiveColumn.keyspace_tasks
 unless ks_tasks.exists?(keyspace)
   ks_tasks.create keyspace
 
-  cf_tasks = ActiveColumn.column_family_tasks keyspace
+  cf_tasks = ActiveColumn.column_family_tasks
   [:tweets, :tweet_dms].each do |cf|
     cf_tasks.create cf
   end

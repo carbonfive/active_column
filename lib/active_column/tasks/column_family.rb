@@ -10,6 +10,7 @@ module ActiveColumn
                            :string    => 'BytesType' }
 
       def initialize(keyspace)
+        raise 'Cannot operate on system keyspace' if keyspace == 'system'
         @keyspace = keyspace
       end
 

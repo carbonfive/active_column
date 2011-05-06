@@ -1,7 +1,4 @@
 require 'cassandra/0.7'
-require 'active_support'
-require 'active_support/core_ext/string'
-require 'active_support/core_ext/class/attribute_accessors'
 require 'benchmark'
 require 'yaml'
 
@@ -23,8 +20,10 @@ module ActiveColumn
     require                 'active_column/tasks/ks'
   end
 
-  module Generators
-    require                 'active_column/generators/migration_generator'
+  if defined? ::Rails
+    module Generators
+      require               'active_column/generators/migration_generator'
+    end
   end
 
   extend Configuration

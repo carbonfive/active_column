@@ -178,7 +178,7 @@ module ActiveColumn
           end
 
           migration = MigrationProxy.new
-          migration.name     = name.camelize
+          migration.name     = to_camel name
           migration.version  = version
           migration.filename = file
           klasses << migration
@@ -220,6 +220,10 @@ module ActiveColumn
 
     def down?
       @direction == :down
+    end
+
+    def to_camel(lower_case_and_underscored_word)
+      lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
   end
