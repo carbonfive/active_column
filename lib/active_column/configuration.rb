@@ -3,7 +3,7 @@ module ActiveColumn
   module Configuration
 
     def connect(config)
-      thrift = { :timeout => 3, :retries => 2 }
+      thrift = { :timeout => 3, :retries => 2, :server_retry_period => nil }
       self.connection = Cassandra.new(config['keyspace'], config['servers'], thrift)
     end
 

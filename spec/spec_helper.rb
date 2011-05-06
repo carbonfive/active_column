@@ -4,13 +4,13 @@ require 'rspec-rails'
 require 'rspec/rails/adapters'
 require 'wrong/adapters/rspec'
 
+ENV['RACK_ENV'] = ENV['RAILS_ENV'] = 'test'
 Wrong.config.alias_assert :expect
-
 ActiveColumn::Migration.verbose = false
 
 Dir[ File.expand_path("../support/**/*.rb", __FILE__) ].each {|f| require f}
 
-thrift = { :retries => 3, :timeout => 2 }
+thrift = { :retries => 3, :timeout => 2, :server_retry_period => nil }
 $cassandra = ActiveColumn.connection = Cassandra.new('active_column', '127.0.0.1:9160', thrift)
 
 keyspace = 'active_column'
