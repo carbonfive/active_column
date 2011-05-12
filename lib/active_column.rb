@@ -19,6 +19,9 @@ module ActiveColumn
     autoload :ColumnFamily, 'active_column/tasks/column_family'
   end
 
+  load                      'active_column/tasks/ks.rake'
+
+
   if defined? ::Rails
     module Generators
       require               'active_column/generators/migration_generator'
