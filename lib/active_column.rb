@@ -17,8 +17,6 @@ module ActiveColumn
   module Tasks
     autoload :Keyspace,     'active_column/tasks/keyspace'
     autoload :ColumnFamily, 'active_column/tasks/column_family'
-
-    require                 'active_column/tasks/ks'
   end
 
   if defined? ::Rails
