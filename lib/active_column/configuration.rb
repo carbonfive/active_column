@@ -7,6 +7,8 @@ module ActiveColumn
       override_thrift_options = (config['thrift'] || {}).inject({}){|h, (k, v)| h[k.to_sym] = v; h} # symbolize keys
       thrift_options = default_thrift_options.merge(override_thrift_options)
       self.connection = Cassandra.new(config['keyspace'], config['servers'], thrift_options)
+      self.connection.disable_node_auto_discovery! if config[:disable_node_auto_discovery] == true
+      self.connection
     end
 
     def connected?
