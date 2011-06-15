@@ -105,7 +105,8 @@ namespace :ks do
   end
 
   def configure
-    @configs = YAML.load_file("#{current_root}/config/cassandra.yml")
+    file = "#{current_root}/config/cassandra.yml"
+    @configs = YAML::load(ERB.new(IO.read(file)).result)
     @config = @configs[ActiveColumn::Helpers.current_env]
     ActiveColumn.connect @config
   end
