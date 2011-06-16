@@ -40,6 +40,11 @@ command:
 rails g active_column:migration NameOfYourMigration
 </pre>
 
+If you are using Rails 2, run this command instead:
+<pre>
+./script/generate ks_migration NameOfYourMigration
+</pre>
+
 The name of the migration might be something like "CreateUsersColumnFamily".  After you run this command, you should see
 a new file that is located here:
 
