@@ -1,0 +1,6 @@
+Description:
+    Create an empty Cassandra migration file in 'ks/migrate'.  Very similar to Rails database migrations.
+   
+Example:
+    ./script/generate ks_migration CreateFooColumnFamily
+
