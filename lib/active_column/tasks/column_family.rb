@@ -66,6 +66,21 @@ module ActiveColumn
         if type && COMPARATOR_TYPES.has_key?(type)
           cf.comparator_type = COMPARATOR_TYPES[type]
         end
+        
+        subtype = cf.subcomparator_type
+        if subtype && COMPARATOR_TYPES.has_key?(subtype)
+          cf.subcomparator_type = COMPARATOR_TYPES[subtype]
+        end
+        
+        column_type = cf.column_type.to_s
+        
+        if column_type.downcase == 'super'
+          cf.column_type = "Super"
+        elsif column_type.downcase == 'standard'
+          cf.column_type = "Standard"
+        else
+          raise Exception.new("Unrecognized column_type #{column_type}")
+        end
         cf
       end
 
