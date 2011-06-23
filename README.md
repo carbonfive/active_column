@@ -64,8 +64,8 @@ You can use embedded ruby code in the YAML file to determine host/machine specif
 
 <pre>
   production:
-    servers: "<%=get_from_file('abc.conf')%>:9160"
-    keyspace: "<%=get_from_file('abc.conf')%>"
+    servers: "&lt;%=get_from_file('abc.conf')%&gt;:9160"
+    keyspace: "&lt;%=get_from_file('abc.conf')%&gt;"
     disable_node_auto_discovery: true
     thrift:
       timeout: 3
