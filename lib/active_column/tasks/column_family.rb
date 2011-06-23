@@ -7,7 +7,12 @@ module ActiveColumn
       COMPARATOR_TYPES = { :time      => 'TimeUUIDType',
                            :timestamp => 'TimeUUIDType',
                            :long      => 'LongType',
-                           :string    => 'BytesType' }
+                           :string    => 'BytesType',
+                           :utf8      => 'UTF8Type',
+                           :lexical_uuid => 'LexicalUUIDType'}
+                           
+      COLUMN_TYPES = {:super => 'Super',
+                      :standard => 'Standard'}
 
       def initialize(keyspace)
         raise 'Cannot operate on system keyspace' if keyspace == 'system'
