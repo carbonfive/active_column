@@ -60,6 +60,22 @@ development:
     retries: 2
 </pre>
 
+You can use embedded ruby code in the YAML file to determine host/machine specific settings.
+
+<pre>
+  production:
+    servers: "<%=get_from_file('abc.conf')%>:9160"
+    keyspace: "<%=get_from_file('abc.conf')%>"
+    disable_node_auto_discovery: true
+    thrift:
+      timeout: 3
+      retries: 2
+</pre>
+
+Node Auto Discovery
+
+You can set disable_node_auto_discovery to off by setting disable_node_auto_discovery flag in your cassandra.yml
+
 In order to get time line modeling support, you must provide ActiveColumn with an instance of a Cassandra object.
 Since you have your cassandra.yml from above, you can do this very simply like this:
 
