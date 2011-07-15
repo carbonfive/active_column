@@ -32,19 +32,11 @@ module ActiveColumn
         block.call cf if block
 
         post_process_column_family(cf)
-        if exists?(cf.name)
-          puts "#{cf.name} already exists in this keyspace, so we cannot add it."
-        else
-          connection.add_column_family(cf)
-        end
+        connection.add_column_family(cf)
       end
 
       def drop(name)
-        if not exists?(name)
-          puts "#{name} does not exist in this keyspace, so we cannot drop it."
-        else
-          connection.drop_column_family(name.to_s)
-        end
+        connection.drop_column_family(name.to_s)
       end
 
       def rename(old_name, new_name)
