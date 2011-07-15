@@ -5,7 +5,7 @@ require 'active_column/tasks/column_family'
 namespace :ks do
 
   if defined? ::Rails
-    task :configure => :environment do
+    task :configure do
       configure
     end
   else
