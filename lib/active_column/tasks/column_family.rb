@@ -4,15 +4,15 @@ module ActiveColumn
 
     class ColumnFamily
 
-      COMPARATOR_TYPES = { :time      => 'TimeUUIDType',
-                           :timestamp => 'TimeUUIDType',
-                           :long      => 'LongType',
-                           :string    => 'BytesType',
-                           :utf8      => 'UTF8Type',
+      COMPARATOR_TYPES = { :time         => 'TimeUUIDType',
+                           :timestamp    => 'TimeUUIDType',
+                           :long         => 'LongType',
+                           :string       => 'BytesType',
+                           :utf8         => 'UTF8Type',
                            :lexical_uuid => 'LexicalUUIDType'}
                            
-      COLUMN_TYPES = {:super => 'Super',
-                      :standard => 'Standard'}
+      COLUMN_TYPES = { :super    => 'Super',
+                       :standard => 'Standard' }
 
       def initialize(keyspace)
         raise 'Cannot operate on system keyspace' if keyspace == 'system'
@@ -64,15 +64,13 @@ module ActiveColumn
           cf.subcomparator_type = COMPARATOR_TYPES[subtype]
         end
         
-        column_type = cf.column_type.to_s
-        
-        if column_type.downcase == 'super'
-          cf.column_type = "Super"
-        elsif column_type.downcase == 'standard'
-          cf.column_type = "Standard"
+        column_type = cf.column_type.to_s.downcase.to_sym
+        if COLUMN_TYPES.has_key?(column_type)
+          cf.column_type = COLUMN_TYPES[column_type]
         else
-          raise Exception.new("Unrecognized column_type #{column_type}")
+          raise ArgumentError, "Unrecognized column_type #{column_type}"
         end
+        
         cf
       end
 
