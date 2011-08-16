@@ -25,7 +25,9 @@ module ActiveColumn
 
   if defined? ::Rails
     module Generators
-      require               'active_column/generators/migration_generator'
+      if ::Rails::VERSION::MAJOR >= 3
+        require             'active_column/generators/migration_generator'
+      end
     end
   end
 
