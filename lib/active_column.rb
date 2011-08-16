@@ -1,6 +1,7 @@
 require 'cassandra/0.8'
 require 'benchmark'
 require 'yaml'
+require 'erb'
 
 module ActiveColumn
 
