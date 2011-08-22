@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'cassandra', '>= 0.9'
+  s.add_dependency 'simple_uuid', '~> 0.1.0'
   s.add_dependency 'rake'
 
   s.add_development_dependency 'rails', '>= 3.0'
