@@ -4,3 +4,4 @@ doc/*
 *.gem
 .bundle
 .idea
+vendor
