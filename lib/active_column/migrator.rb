@@ -173,8 +173,8 @@ module ActiveColumn
             raise DuplicateMigrationVersionError.new(version)
           end
 
-          if klasses.detect { |m| m.name == name.camelize }
-            raise DuplicateMigrationNameError.new(name.camelize)
+          if klasses.detect { |m| m.name == name }
+            raise DuplicateMigrationNameError.new(name)
           end
 
           migration = MigrationProxy.new
