@@ -98,8 +98,8 @@ Add column family
 <pre>
   create_column_family :impressions do |cf|
     cf.comment = 'impressions for something'
-    cf.comparator_type = 'UTF8Type'
-    cf.key_validation_class = 'UTF8Type'  
+    cf.comparator_type = :long
+    cf.key_validation_class = :long  
   end
 </pre>
 
@@ -113,7 +113,7 @@ Rename column family
   rename_column_family :impressions, :showings
 </pre>
 
-Updating column family
+Update column family
 <pre>
   update_column_family :impressions do |cf|
     cf.comment = "blah"
