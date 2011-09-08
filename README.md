@@ -92,9 +92,9 @@ ActiveColumn.connection = $cassandra
 
 As you can see, I create a global $cassandra variable, which I use in my tests to validate data directly in Cassandra.
 
-### Usage
+### Examples
 
-Adding column family
+Add column family
 <pre>
   create_column_family :impressions do |cf|
     cf.comment = 'impressions for something'
@@ -109,7 +109,6 @@ Drop column family
 </pre>
 
 Rename column family
-
 <pre>
   rename_column_family :impressions, :showings
 </pre>
