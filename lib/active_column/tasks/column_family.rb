@@ -35,6 +35,20 @@ module ActiveColumn
         connection.add_column_family(cf)
       end
 
+      def update(name, &block)
+        cfs = connection.schema.cf_defs.select do |column_family|
+          column_family.name == name.to_s
+        end
+
+        cf = cfs.first # only the first matching cf of that name
+        raise "Can not find column family #{name}" if cf.nil?
+        
+        block.call cf if block
+        
+        post_process_column_family(cf)
+        connection.update_column_family(cf)
+      end
+
       def drop(name)
         connection.drop_column_family(name.to_s)
       end

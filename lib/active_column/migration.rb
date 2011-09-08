@@ -53,6 +53,10 @@ module ActiveColumn
       ActiveColumn.column_family_tasks.create(name, &block)
     end
 
+    def self.update_column_family(name, &block)
+      ActiveColumn.column_family_tasks.update(name, &block)
+    end
+
     # Drops the given column family
     def self.drop_column_family(name)
       ActiveColumn.column_family_tasks.drop(name)
