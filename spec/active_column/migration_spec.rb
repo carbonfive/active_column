@@ -55,4 +55,26 @@ describe ActiveColumn::Migration do
       end
     end
   end
+  
+  describe '.update_column_family' do
+
+    context 'given a block' do
+      before do
+        ActiveColumn.connection.expects(:update_column_family).with() do |cf|
+          cf.name == 'tweets' && cf.comment = 'some comment'
+        end
+      end
+
+      it 'sends the settings to cassandra' do
+        ActiveColumn::Migration.update_column_family :tweets do |cf|
+          cf.comment = 'some comment'
+        end
+      end
+    end
+
+  end
+  
+  
+  
+  
 end

@@ -92,6 +92,36 @@ ActiveColumn.connection = $cassandra
 
 As you can see, I create a global $cassandra variable, which I use in my tests to validate data directly in Cassandra.
 
+### Usage
+
+Adding column family
+<pre>
+  create_column_family :impressions do |cf|
+    cf.comment = 'impressions for something'
+    cf.comparator_type = 'UTF8Type'
+    cf.key_validation_class = 'UTF8Type'  
+  end
+</pre>
+
+Drop column family
+<pre>
+  drop_column_family :impressions
+</pre>
+
+Rename column family
+
+<pre>
+  rename_column_family :impressions, :showings
+</pre>
+
+Updating column family
+<pre>
+  update_column_family :impressions do |cf|
+    cf.comment = "blah"
+    cf.gc_grace_seconds = 3600
+  end
+</pre>
+
 One other thing to note is that you obviously must have Cassandra installed and running!  Please take a look at the
 [mama_cass gem](https://github.com/carbonfive/mama_cass) for a quick way to get up and running with Cassandra for
 development and testing.
