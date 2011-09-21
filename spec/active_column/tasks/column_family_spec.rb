@@ -75,7 +75,60 @@ describe ActiveColumn::Tasks::ColumnFamily do
     end
   end
 
+  describe '.updating_column_family' do
+    before do 
+      @cf_tasks = ActiveColumn.column_family_tasks
+
+      if @cf_tasks.exists?(:test_cf) 
+        @cf_tasks.drop(:test_cf)
+      end
+      
+      @cf_tasks.create(:test_cf) do |cf|
+        cf.comment = "foo"
+        cf.comparator_type = :long
+      end
+    end
+    
+    context "given a block of column family updates" do
+      it "post process given column definitions" do
+        cf_comparator_type(:test_cf).should == 'org.apache.cassandra.db.marshal.LongType'
+        
+        @cf_tasks.update(:test_cf) do |cf|
+          cf.comparator_type = :long
+        end
+        cf_comparator_type(:test_cf).should == 'org.apache.cassandra.db.marshal.LongType'
+
+      end
+
+      it 'updates column family definitions' do
+        cf_comment(:test_cf).should == "foo"
+        
+        @cf_tasks.update(:test_cf) do |cf|
+          cf.comment = "some new comment"
+        end
+        
+        cf_comment(:test_cf).should == "some new comment" 
+      end
+    end
+  end
+
 end
+
+
+def cf_attr(name, attribute)
+  cassandra = @cf_tasks.send(:connection)
+  cf_def = cassandra.schema.cf_defs.select{|cf| cf.name == name.to_s}.first
+  cf_def.send(attribute)
+end
+
+def cf_comment(name)
+  cf_attr(name, :comment)
+end
+
+def cf_comparator_type(name)
+  cf_attr(name, :comparator_type)
+end
+
 
 def translated(c, sc, ct)
   cf_tasks = ActiveColumn.column_family_tasks

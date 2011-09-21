@@ -60,6 +60,22 @@ development:
     retries: 2
 </pre>
 
+You can use embedded ruby code in the YAML file to determine host/machine specific settings.
+
+<pre>
+  production:
+    servers: "&lt;%=get_from_file('abc.conf')%&gt;:9160"
+    keyspace: "&lt;%=get_from_file('abc.conf')%&gt;"
+    disable_node_auto_discovery: true
+    thrift:
+      timeout: 3
+      retries: 2
+</pre>
+
+Node Auto Discovery
+
+You can set disable_node_auto_discovery to off by setting disable_node_auto_discovery flag in your cassandra.yml
+
 In order to get time line modeling support, you must provide ActiveColumn with an instance of a Cassandra object.
 Since you have your cassandra.yml from above, you can do this very simply like this:
 
@@ -75,6 +91,35 @@ ActiveColumn.connection = $cassandra
 </pre>
 
 As you can see, I create a global $cassandra variable, which I use in my tests to validate data directly in Cassandra.
+
+### Examples
+
+Add column family
+<pre>
+  create_column_family :impressions do |cf|
+    cf.comment = 'impressions for something'
+    cf.comparator_type = :utf8 
+    cf.key_validation_class = :utf8 
+  end
+</pre>
+
+Drop column family
+<pre>
+  drop_column_family :impressions
+</pre>
+
+Rename column family
+<pre>
+  rename_column_family :impressions, :showings
+</pre>
+
+Update column family
+<pre>
+  update_column_family :impressions do |cf|
+    cf.comment = "blah"
+    cf.gc_grace_seconds = 3600
+  end
+</pre>
 
 One other thing to note is that you obviously must have Cassandra installed and running!  Please take a look at the
 [mama_cass gem](https://github.com/carbonfive/mama_cass) for a quick way to get up and running with Cassandra for

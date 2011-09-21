@@ -20,7 +20,7 @@ module ActiveColumn
       end
 
       def exists?(name)
-        connection.schema.cf_defs.find { |cf_def| cf_def.name == name.to_s }
+        ! find_by_name(name).nil?
       end
 
       def create(name, &block)
@@ -33,6 +33,16 @@ module ActiveColumn
 
         post_process_column_family(cf)
         connection.add_column_family(cf)
+      end
+
+      def update(name, &block)
+        cf = find_by_name(name)
+        raise "Can not find column family #{name}" if cf.nil?
+        
+        block.call cf if block
+        
+        post_process_column_family(cf)
+        connection.update_column_family(cf)
       end
 
       def drop(name)
@@ -51,6 +61,10 @@ module ActiveColumn
 
       def connection
         ActiveColumn.connection
+      end
+
+      def find_by_name(name)
+        connection.schema.cf_defs.find { |cf_def| cf_def.name == name.to_s }
       end
 
       def post_process_column_family(cf)
