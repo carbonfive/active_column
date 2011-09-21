@@ -20,7 +20,7 @@ module ActiveColumn
       end
 
       def exists?(name)
-        connection.schema.cf_defs.find { |cf_def| cf_def.name == name.to_s }
+        ! find_by_name(name).nil?
       end
 
       def create(name, &block)
@@ -36,11 +36,7 @@ module ActiveColumn
       end
 
       def update(name, &block)
-        cfs = connection.schema.cf_defs.select do |column_family|
-          column_family.name == name.to_s
-        end
-
-        cf = cfs.first # only the first matching cf of that name
+        cf = find_by_name(name)
         raise "Can not find column family #{name}" if cf.nil?
         
         block.call cf if block
@@ -65,6 +61,10 @@ module ActiveColumn
 
       def connection
         ActiveColumn.connection
+      end
+
+      def find_by_name(name)
+        connection.schema.cf_defs.find { |cf_def| cf_def.name == name.to_s }
       end
 
       def post_process_column_family(cf)
