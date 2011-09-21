@@ -100,7 +100,7 @@ describe ActiveColumn::Tasks::ColumnFamily do
 
       end
 
-      it 'updated colum family definitions' do
+      it 'updates column family definitions' do
         cf_comment(:test_cf).should == "foo"
         
         @cf_tasks.update(:test_cf) do |cf|
