@@ -23,7 +23,7 @@ module ActiveColumn
     def find(key_parts, options = {})
       keys = generate_keys key_parts
       ActiveColumn.connection.multi_get(column_family, keys, options).each_with_object( {} ) do |(user, row), results|
-        results[user] = row.to_a.collect { |(_uuid, col)| new(ActiveSupport::JSON.decode(col)) }
+        results[user] = row.to_a.collect { |(_uuid, col)| new(JSON.parse(col)) }
       end
     end
 
@@ -54,7 +54,7 @@ module ActiveColumn
   end
 
   def save()
-    value = { SimpleUUID::UUID.new => ActiveSupport::JSON.encode(self) }
+    value = { SimpleUUID::UUID.new => self.to_json }
     key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
       key_parts[key_config.key] = self.send(key_config.func)
     end

@@ -34,3 +34,18 @@ class Object
     result.to_json(*a)
   end
 end
+
+if ! defined? String.tableize
+class String
+  def tableize
+    t = self.dup.to_s
+    t += ( t =~ /s$/ ? 'es' : 's' )
+    t.gsub!(/::/, '/')
+    t.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+    t.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+    t.tr!("-", "_")
+    t.downcase!
+    t
+  end
+end
+end
