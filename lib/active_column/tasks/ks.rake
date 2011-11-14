@@ -1,4 +1,5 @@
 require 'rake'
+require 'erb'
 require 'active_column/tasks/keyspace'
 require 'active_column/tasks/column_family'
 
