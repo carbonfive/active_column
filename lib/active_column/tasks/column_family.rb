@@ -4,16 +4,8 @@ module ActiveColumn
 
     class ColumnFamily
 
-      COMPARATOR_TYPES = { :time         => 'TimeUUIDType',
-                           :timestamp    => 'TimeUUIDType',
-                           :long         => 'LongType',
-                           :string       => 'BytesType',
-                           :utf8         => 'UTF8Type',
-                           :lexical_uuid => 'LexicalUUIDType'}
-                           
-      COLUMN_TYPES = { :super    => 'Super',
-                       :standard => 'Standard' }
-
+      include ActiveColumn::Constants
+      
       def initialize(keyspace)
         raise 'Cannot operate on system keyspace' if keyspace == 'system'
         @keyspace = keyspace
@@ -24,10 +16,11 @@ module ActiveColumn
       end
 
       def create(name, &block)
-        cf = Cassandra::ColumnFamily.new
+        cf = ActiveColumn::Types::ColumnFamily.new
         cf.name = name.to_s
         cf.keyspace = @keyspace.to_s
         cf.comparator_type = 'TimeUUIDType'
+	cf.column_metadata = []
 
         block.call cf if block
 
@@ -84,7 +77,18 @@ module ActiveColumn
         else
           raise ArgumentError, "Unrecognized column_type #{column_type}"
         end
-        
+  
+	replace = ["comparator_type", "default_validation_class", "key_validation_class"]
+	replace.each do |rep|
+	  attr = cf.send(rep)
+	  next unless attr.is_a? Symbol
+	  if COMPARATOR_TYPES.has_key?(attr)
+	    cf.send("#{rep}=", COMPARATOR_TYPES[attr])
+	  else
+	    raise ArgumentError, "Unrecognized #{rep}: #{attr}"
+	  end
+	end	  
+
         cf
       end
 
