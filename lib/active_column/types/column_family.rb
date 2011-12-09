@@ -6,7 +6,7 @@ module ActiveColumn
 
       def column(name, &block)	
 	cd = CassandraThrift::ColumnDef.new
-	cd.name = name
+	cd.name = name.to_s
 	block.call cd if block	
 	post_process_column_metadata(cd)
 	self.column_metadata << cd
