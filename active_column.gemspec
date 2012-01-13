@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'cassandra', '>= 0.9'
+  s.add_dependency 'cassandra', '>= 0.12'
   s.add_dependency 'simple_uuid', '~> 0.1.0'
   s.add_dependency 'rake'
 

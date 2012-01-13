@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     active_column (0.2)
-      cassandra (>= 0.9)
+      cassandra (>= 0.12)
       rake
       simple_uuid (~> 0.1.0)
 
