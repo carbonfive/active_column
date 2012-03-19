@@ -33,7 +33,7 @@ bundle install
 
 ### Configuration
 
-ActiveColumn requires Cassandra 0.7 or above, as well as the [cassandra gem](https://github.com/fauna/cassandra),
+ActiveColumn requires Cassandra 0.7 or above, as well as the [cassandra gem](https://github.com/twitter/cassandra),
 version 0.9 or above.  You must also be sure to use the Cassandra 0.7 support in the gem, which can be done by
 adding Cassandra to your Gemfile like this:
 <pre>
