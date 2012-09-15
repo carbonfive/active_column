@@ -6,6 +6,7 @@ module ActiveColumn
 
   autoload :Base,           'active_column/base'
   autoload :Configuration,  'active_column/configuration'
+  autoload :Constants,	    'active_column/constants'
   autoload :KeyConfig,      'active_column/key_config'
   autoload :Version,        'active_column/version'
   autoload :Helpers,        'active_column/helpers'
@@ -17,6 +18,10 @@ module ActiveColumn
   module Tasks
     autoload :Keyspace,     'active_column/tasks/keyspace'
     autoload :ColumnFamily, 'active_column/tasks/column_family'
+  end
+
+  module Types
+    autoload :ColumnFamily, 'active_column/types/column_family'
   end
 
   load                      'active_column/tasks/ks.rake'
