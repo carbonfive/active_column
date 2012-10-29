@@ -54,7 +54,7 @@ module ActiveColumn
   end
 
   def save()
-    value = { SimpleUUID::UUID.new => self.to_json }
+    value = { SimpleUUID::UUID.new.to_s => self.to_json }
     key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
       key_parts[key_config.key] = self.send(key_config.func)
     end
