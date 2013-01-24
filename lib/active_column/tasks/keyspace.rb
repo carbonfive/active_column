@@ -29,6 +29,9 @@ module ActiveColumn
           return nil
         end
 
+        # YAML gives us hashes as String => Value, but Cassandra expects Symbol => Value
+        options = Hash[ options.map { |k,v| [k.to_sym, v] } ]
+
         opts = { :name => name.to_s,
                  :strategy_class => 'org.apache.cassandra.locator.SimpleStrategy',
                  :replication_factor => 1,
