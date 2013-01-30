@@ -65,7 +65,7 @@ module ActiveColumn
   def delete
     value = { SimpleUUID::UUID.new.to_s => self.to_json }
     keys.each do |key|
-      ActiveColumn.connection.remove(self.class.column_family, key, value)
+      ActiveColumn.connection.remove(self.class.column_family, key)
     end
   end
 
