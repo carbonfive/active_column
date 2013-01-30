@@ -53,19 +53,28 @@ module ActiveColumn
     end
   end
 
-  def save()
+  def save
     value = { SimpleUUID::UUID.new.to_s => self.to_json }
-    key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
-      key_parts[key_config.key] = self.send(key_config.func)
-    end
-    keys = self.class.generate_keys(key_parts)
-
     keys.each do |key|
       ActiveColumn.connection.insert(self.class.column_family, key, value)
     end
 
-    self
+    return self
   end
+
+  def delete
+    value = { SimpleUUID::UUID.new.to_s => self.to_json }
+    keys.each do |key|
+      ActiveColumn.connection.remove(self.class.column_family, key)
+    end
+  end
+
+  def keys
+    key_parts = self.class.keys.each_with_object( {} ) do |key_config, key_parts|
+      key_parts[key_config.key] = self.send(key_config.func)
+    end
+    keys = self.class.generate_keys(key_parts)
+  end  
 
   class Base
     include ActiveColumn
